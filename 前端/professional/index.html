@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>禄命排盘 - 专业细盘</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="../算法/lunar.js"></script>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>专业细盘</h1>
+        </header>
+
+        <main class="main-content">
+            <!-- 基本信息卡片 -->
+            <div class="card info-card" id="info-card">
+                <div class="info-content">
+                    <div class="info-row">
+                        <span class="info-label">姓名：</span>
+                        <span class="info-value" id="info-name">匿名</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">阳历：</span>
+                        <span class="info-value" id="info-solar"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">农历：</span>
+                        <span class="info-value" id="info-lunar"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">节气：</span>
+                        <span class="info-value" id="info-solar-term"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">四柱：</span>
+                        <span class="info-value" id="info-bazi"></span>
+                    </div>
+                </div>
+                <button class="toggle-btn" id="dayun-liunian-btn">大运流年</button>
+            </div>
+
+            <!-- 四柱主体表格 -->
+            <div class="card pai-pan-card" id="pai-pan-card">
+                <div class="pai-pan-table" id="pai-pan-table">
+                    <!-- 表头 -->
+                    <div class="table-header">
+                        <div class="header-cell pillar-header">年柱</div>
+                        <div class="header-cell pillar-header">月柱</div>
+                        <div class="header-cell pillar-header">日柱</div>
+                        <div class="header-cell pillar-header">时柱</div>
+                        <div class="header-cell sanyuan-header" id="header-taiyuan">胎元</div>
+                        <div class="header-cell sanyuan-header" id="header-minggong">命宫</div>
+                        <div class="header-cell sanyuan-header" id="header-shengong">身宫</div>
+                    </div>
+                    
+                    <!-- 十神行 -->
+                    <div class="table-row shizhi-row">
+                        <div class="table-cell shizhi-cell" id="shizhi-year"></div>
+                        <div class="table-cell shizhi-cell" id="shizhi-month"></div>
+                        <div class="table-cell shizhi-cell" id="shizhi-day"></div>
+                        <div class="table-cell shizhi-cell" id="shizhi-hour"></div>
+                        <div class="table-cell shizhi-cell" id="shizhi-taiyuan"></div>
+                        <div class="table-cell shizhi-cell" id="shizhi-minggong"></div>
+                        <div class="table-cell shizhi-cell" id="shizhi-shengong"></div>
+                    </div>
+
+                    <!-- 天干行 -->
+                    <div class="table-row stem-row">
+                        <div class="table-cell stem-cell" id="stem-year"></div>
+                        <div class="table-cell stem-cell" id="stem-month"></div>
+                        <div class="table-cell stem-cell" id="stem-day"></div>
+                        <div class="table-cell stem-cell" id="stem-hour"></div>
+                        <div class="table-cell stem-cell" id="stem-taiyuan"></div>
+                        <div class="table-cell stem-cell" id="stem-minggong"></div>
+                        <div class="table-cell stem-cell" id="stem-shengong"></div>
+                    </div>
+                    
+                    <!-- 地支行 -->
+                    <div class="table-row branch-row">
+                        <div class="table-cell branch-cell" id="branch-year"></div>
+                        <div class="table-cell branch-cell" id="branch-month"></div>
+                        <div class="table-cell branch-cell" id="branch-day"></div>
+                        <div class="table-cell branch-cell" id="branch-hour"></div>
+                        <div class="table-cell branch-cell" id="branch-taiyuan"></div>
+                        <div class="table-cell branch-cell" id="branch-minggong"></div>
+                        <div class="table-cell branch-cell" id="branch-shengong"></div>
+                    </div>
+                    
+                    <!-- 藏干行 -->
+                    <div class="table-row zanggan-row">
+                        <div class="table-cell zanggan-cell" id="zanggan-year"></div>
+                        <div class="table-cell zanggan-cell" id="zanggan-month"></div>
+                        <div class="table-cell zanggan-cell" id="zanggan-day"></div>
+                        <div class="table-cell zanggan-cell" id="zanggan-hour"></div>
+                        <div class="table-cell zanggan-cell" id="zanggan-taiyuan"></div>
+                        <div class="table-cell zanggan-cell" id="zanggan-minggong"></div>
+                        <div class="table-cell zanggan-cell" id="zanggan-shengong"></div>
+                    </div>
+                    
+                    <!-- 纳音行 -->
+                    <div class="table-row nayin-row">
+                        <div class="table-cell nayin-cell" id="nayin-year"></div>
+                        <div class="table-cell nayin-cell" id="nayin-month"></div>
+                        <div class="table-cell nayin-cell" id="nayin-day"></div>
+                        <div class="table-cell nayin-cell" id="nayin-hour"></div>
+                        <div class="table-cell nayin-cell" id="nayin-taiyuan"></div>
+                        <div class="table-cell nayin-cell" id="nayin-minggong"></div>
+                        <div class="table-cell nayin-cell" id="nayin-shengong"></div>
+                    </div>
+                    
+                    <!-- 长生行 -->
+                    <div class="table-row changsheng-row">
+                        <div class="table-cell changsheng-cell" id="changsheng-year"></div>
+                        <div class="table-cell changsheng-cell" id="changsheng-month"></div>
+                        <div class="table-cell changsheng-cell" id="changsheng-day"></div>
+                        <div class="table-cell changsheng-cell" id="changsheng-hour"></div>
+                        <div class="table-cell changsheng-cell" id="changsheng-taiyuan"></div>
+                        <div class="table-cell changsheng-cell" id="changsheng-minggong"></div>
+                        <div class="table-cell changsheng-cell" id="changsheng-shengong"></div>
+                    </div>
+                    
+                    <!-- 神煞行 -->
+                    <div class="table-row shensha-row">
+                        <div class="table-cell shensha-cell" id="shensha-year"></div>
+                        <div class="table-cell shensha-cell" id="shensha-month"></div>
+                        <div class="table-cell shensha-cell" id="shensha-day"></div>
+                        <div class="table-cell shensha-cell" id="shensha-hour"></div>
+                        <div class="table-cell shensha-cell" id="shensha-taiyuan"></div>
+                        <div class="table-cell shensha-cell" id="shensha-minggong"></div>
+                        <div class="table-cell shensha-cell" id="shensha-shengong"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 三垣卡片 -->
+            <div class="card sanyuan-card" id="sanyuan-card" style="display: none;">
+                <div class="section-title">禄命三垣</div>
+                <div class="sanyuan-container">
+                    <div class="sanyuan-item" id="taiyuan-item">
+                        <div class="sanyuan-name">胎元</div>
+                        <div class="sanyuan-ganzhi" id="taiyuan-ganzhi"></div>
+                        <div class="sanyuan-nayin" id="taiyuan-nayin"></div>
+                        <div class="sanyuan-changsheng" id="taiyuan-changsheng"></div>
+                    </div>
+                    <div class="sanyuan-item" id="minggong-item">
+                        <div class="sanyuan-name">命宫</div>
+                        <div class="sanyuan-ganzhi" id="minggong-ganzhi"></div>
+                        <div class="sanyuan-nayin" id="minggong-nayin"></div>
+                        <div class="sanyuan-changsheng" id="minggong-changsheng"></div>
+                    </div>
+                    <div class="sanyuan-item" id="shengong-item">
+                        <div class="sanyuan-name">身宫</div>
+                        <div class="sanyuan-ganzhi" id="shengong-ganzhi"></div>
+                        <div class="sanyuan-nayin" id="shengong-nayin"></div>
+                        <div class="sanyuan-changsheng" id="shengong-changsheng"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 神煞按柱位显示 -->
+            <div class="card shensha-column-card" id="shensha-column-card">
+                <div class="section-title">神煞按柱</div>
+                <div class="shensha-column-grid" id="shensha-column-grid">
+                    <!-- 通过JS动态生成 -->
+                </div>
+            </div>
+
+            <!-- 大运小运卡片 -->
+            <div class="card dayun-card" id="dayun-card">
+                <div class="section-title">大运小运</div>
+                
+                <!-- 当前流运标题区 -->
+                <div class="current-liuyun-section">
+                    <div class="liuyun-item dayun-item">
+                        <div class="liuyun-title" id="current-dayun-title">大运<span id="current-dayun-ganzhi"></span></div>
+                        <div class="liuyun-shensha" id="current-dayun-shensha"></div>
+                    </div>
+                    <div class="liuyun-item xiaoyun-item">
+                        <div class="liuyun-title" id="current-xiaoyun-title">小运<span id="current-xiaoyun-ganzhi"></span></div>
+                        <div class="liuyun-shensha" id="current-xiaoyun-shensha"></div>
+                    </div>
+                    <div class="liuyun-item liunian-item">
+                        <div class="liuyun-title" id="current-liunian-title">流年<span id="current-liunian-ganzhi"></span></div>
+                        <div class="liuyun-shensha" id="current-liunian-shensha"></div>
+                    </div>
+                </div>
+                
+                <!-- 大运横向表格 -->
+                <div class="dayun-table-container">
+                    <div class="dayun-subtitle">大运（<span id="dayun-direction">顺行</span>）</div>
+                    <div class="dayun-table-scroll">
+                        <table class="dayun-table" id="dayun-table">
+                            <thead>
+                                <tr class="dayun-header-row">
+                                    <th class="dayun-label-cell">十神</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="dayun-ganzhi-row">
+                                    <td class="dayun-label-cell">大运</td>
+                                </tr>
+                                <tr class="dayun-nayin-row">
+                                    <td class="dayun-label-cell">纳音</td>
+                                </tr>
+                                <tr class="dayun-age-row">
+                                    <td class="dayun-label-cell">虚岁</td>
+                                </tr>
+                                <tr class="dayun-date-row">
+                                    <td class="dayun-label-cell">交运日期</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 小运流年表格 -->
+                <div class="xiaoyun-table-container">
+                    <div class="xiaoyun-subtitle">小运流年</div>
+                    <div class="xiaoyun-table-scroll">
+                        <table class="xiaoyun-table" id="xiaoyun-table">
+                            <tbody>
+                                <tr class="xiaoyun-liunian-row">
+                                    <td class="dayun-label-cell">流年</td>
+                                </tr>
+                                <tr class="xiaoyun-xiaoyun-row">
+                                    <td class="dayun-label-cell">小运</td>
+                                </tr>
+                                <tr class="xiaoyun-age-row">
+                                    <td class="dayun-label-cell">虚岁</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 详细分析卡片 -->
+            <div class="card analysis-card" id="analysis-card">
+                <div class="section-title">详细分析</div>
+                
+                <div class="analysis-tabs">
+                    <button class="analysis-tab active" data-tab="wuxing">五行</button>
+                    <button class="analysis-tab" data-tab="shensha">神煞</button>
+                    <button class="analysis-tab" data-tab="changsheng">长生</button>
+                    <button class="analysis-tab" data-tab="kongwang">空亡</button>
+                </div>
+                
+                <div class="analysis-content">
+                    <!-- 五行强弱 -->
+                    <div class="analysis-section active" id="wuxing-analysis">
+                        <div class="wuxing-grid">
+                            <div class="wuxing-item">
+                                <div class="wuxing-label">木</div>
+                                <div class="wuxing-strength" id="wuxing-mu">待计算</div>
+                            </div>
+                            <div class="wuxing-item">
+                                <div class="wuxing-label">火</div>
+                                <div class="wuxing-strength" id="wuxing-huo">待计算</div>
+                            </div>
+                            <div class="wuxing-item">
+                                <div class="wuxing-label">土</div>
+                                <div class="wuxing-strength" id="wuxing-tu">待计算</div>
+                            </div>
+                            <div class="wuxing-item">
+                                <div class="wuxing-label">金</div>
+                                <div class="wuxing-strength" id="wuxing-jin">待计算</div>
+                            </div>
+                            <div class="wuxing-item">
+                                <div class="wuxing-label">水</div>
+                                <div class="wuxing-strength" id="wuxing-shui">待计算</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 神煞列表 -->
+                    <div class="analysis-section" id="shensha-analysis">
+                        <div class="shensha-list" id="shensha-list">
+                            <div class="shensha-placeholder">神煞算法待实现</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 十二长生 -->
+                    <div class="analysis-section" id="changsheng-analysis">
+                        <div class="changsheng-grid" id="changsheng-grid">
+                            <!-- 通过JS动态生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 空亡信息 -->
+                    <div class="analysis-section" id="kongwang-analysis">
+                        <div class="kongwang-list" id="kongwang-list">
+                            <div class="kongwang-placeholder">空亡算法待实现</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部操作按钮 -->
+            <div class="bottom-actions">
+                <button class="action-btn" id="back-btn">返回</button>
+                <button class="action-btn" id="copy-btn">复制</button>
+                <button class="action-btn" id="note-btn">笔记</button>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item" data-page="paipan" onclick="window.location.href='../首页排盘/index.html'">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 2 C12 12, 12 12, 22 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 22 C12 12, 12 12, 2 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+                <span class="nav-text">排盘</span>
+            </div>
+            <div class="nav-item" data-page="records" onclick="window.location.href='../records/index.html'">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <line x1="8" y1="9" x2="16" y2="9" stroke="currentColor" stroke-width="2"/>
+                    <line x1="8" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">记录</span>
+            </div>
+            <div class="nav-item active" data-page="professional">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M4 4 L12 8 L20 4 L20 16 L12 20 L4 16 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <line x1="12" y1="8" x2="12" y2="20" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">专业</span>
+            </div>
+            <div class="nav-item" data-page="settings" onclick="window.location.href='../用户管理/index.html'">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 2 L12 6 M12 18 L12 22 M2 12 L6 12 M18 12 L22 12" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">设置</span>
+            </div>
+        </nav>
+    </div>
+
+    <script src="../common/database.js"></script>
+    <script src="../common/cloud-api.js"></script>
+    <script src="script.js" type="module"></script>
+</body>
+</html>

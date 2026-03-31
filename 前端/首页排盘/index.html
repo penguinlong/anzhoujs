@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>禄命排盘</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="../算法/lunar.js"></script>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>首页排盘</h1>
+        </header>
+
+        <main class="main-content">
+            <div class="card input-card">
+                <div class="form-group">
+                    <input type="text" id="name" placeholder="请输入姓名" class="input-field">
+                </div>
+
+                <div class="form-group row">
+                    <div class="btn-group" id="gender-group">
+                        <button type="button" class="btn btn-gender active" data-value="male">男</button>
+                        <button type="button" class="btn btn-gender" data-value="female">女</button>
+                    </div>
+                    <div class="btn-group" id="date-type-group">
+                        <button type="button" class="btn btn-date-type active" data-value="solar">公历</button>
+                        <button type="button" class="btn btn-date-type" data-value="lunar">农历</button>
+                    </div>
+                </div>
+
+                <div class="form-group" id="date-input-group">
+                    <div class="date-selects">
+                        <select id="year-select" class="select-field"></select>
+                        <select id="month-select" class="select-field"></select>
+                        <select id="day-select" class="select-field"></select>
+                    </div>
+                    <label class="checkbox-label hidden" id="leap-month-label">
+                        <input type="checkbox" id="leap-month"> 闰月
+                    </label>
+                </div>
+
+                <div class="form-group row">
+                    <select id="hour" class="select-field time-select">
+                        <option value="">请选择时辰</option>
+                        <option value="0">00 (子时)</option>
+                        <option value="1">01 (丑时)</option>
+                        <option value="2">02 (丑时)</option>
+                        <option value="3">03 (寅时)</option>
+                        <option value="4">04 (寅时)</option>
+                        <option value="5">05 (卯时)</option>
+                        <option value="6">06 (卯时)</option>
+                        <option value="7">07 (辰时)</option>
+                        <option value="8">08 (辰时)</option>
+                        <option value="9">09 (巳时)</option>
+                        <option value="10">10 (巳时)</option>
+                        <option value="11">11 (午时)</option>
+                        <option value="12">12 (午时)</option>
+                        <option value="13">13 (未时)</option>
+                        <option value="14">14 (未时)</option>
+                        <option value="15">15 (申时)</option>
+                        <option value="16">16 (申时)</option>
+                        <option value="17">17 (酉时)</option>
+                        <option value="18">18 (酉时)</option>
+                        <option value="19">19 (戌时)</option>
+                        <option value="20">20 (戌时)</option>
+                        <option value="21">21 (亥时)</option>
+                        <option value="22">22 (亥时)</option>
+                        <option value="23">23 (子时)</option>
+                    </select>
+                    <select id="minute" class="select-field time-select">
+                        <option value="0">00 分</option>
+                        <option value="15">15 分</option>
+                        <option value="30">30 分</option>
+                        <option value="45">45 分</option>
+                    </select>
+                </div>
+
+                <div class="form-group row between">
+                    <span class="label-text">时区选择</span>
+                    <select id="timezone" class="select-field" style="width: auto;">
+                        <option value="8">UTC+8 北京时间</option>
+                        <option value="9">UTC+9 东京时间</option>
+                        <option value="-5">UTC-5 美东时间</option>
+                        <option value="-8">UTC-8 美西时间</option>
+                        <option value="auto">自动检测</option>
+                    </select>
+                </div>
+
+                <div class="form-group row between">
+                    <span class="label-text">当前时间</span>
+                    <span id="current-time" class="label-text" style="color: #D4AF37;">--</span>
+                </div>
+
+                <div class="form-group row between">
+                    <span class="label-text">当前位置</span>
+                    <span id="current-location" class="label-text" style="color: #D4AF37;">获取中...</span>
+                </div>
+
+                <button type="button" class="btn-secondary" id="refresh-location" style="width: 100%; margin-bottom: 10px;">
+                    📍 获取当前位置
+                </button>
+
+                <div class="form-group">
+                    <label class="label-text">出生地经度（默认120°）</label>
+                    <input type="number" id="longitude" value="120" step="0.01" class="input-field">
+                </div>
+
+                <div class="form-group row between">
+                    <span class="label-text">真太阳时校正</span>
+                    <label class="switch">
+                        <input type="checkbox" id="true-solar" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="calculate-btn">开始排盘</button>
+
+            <div class="card result-card" id="result-card" style="display:none;">
+                <!-- 顶部信息栏 -->
+                <div class="header-info" id="header-info">
+                    <div class="info-row">
+                        <span class="info-label">姓名：</span>
+                        <span class="info-value" id="info-name">匿名</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">阳历：</span>
+                        <span class="info-value" id="info-solar"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">农历：</span>
+                        <span class="info-value" id="info-lunar"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">节气：</span>
+                        <span class="info-value" id="info-solar-term"></span>
+                    </div>
+                </div>
+
+                <!-- 排盘表格 -->
+                <div class="pai-pan-table" id="pai-pan-table">
+                    <div class="table-header">
+                        <div class="table-cell header-cell">本命</div>
+                        <div class="table-cell header-cell">月</div>
+                        <div class="table-cell header-cell">日</div>
+                        <div class="table-cell header-cell">时</div>
+                        <div class="table-cell header-cell">胎元</div>
+                        <div class="table-cell header-cell">命宫</div>
+                        <div class="table-cell header-cell">身宫</div>
+                    </div>
+                    
+                    <div class="table-row ten-gods-row" id="ten-gods-row">
+                        <div class="table-cell" id="ten-god-year"></div>
+                        <div class="table-cell" id="ten-god-month"></div>
+                        <div class="table-cell" id="ten-god-day"></div>
+                        <div class="table-cell" id="ten-god-hour"></div>
+                        <div class="table-cell" id="ten-god-taiyuan"></div>
+                        <div class="table-cell" id="ten-god-minggong"></div>
+                        <div class="table-cell" id="ten-god-shengong"></div>
+                    </div>
+                    
+                    <div class="table-row heavenly-stem-row" id="heavenly-stem-row">
+                        <div class="table-cell stem-cell" id="stem-year"></div>
+                        <div class="table-cell stem-cell" id="stem-month"></div>
+                        <div class="table-cell stem-cell" id="stem-day"></div>
+                        <div class="table-cell stem-cell" id="stem-hour"></div>
+                        <div class="table-cell stem-cell" id="stem-taiyuan"></div>
+                        <div class="table-cell stem-cell" id="stem-minggong"></div>
+                        <div class="table-cell stem-cell" id="stem-shengong"></div>
+                    </div>
+                    
+                    <div class="table-row earthly-branch-row" id="earthly-branch-row">
+                        <div class="table-cell branch-cell" id="branch-year"></div>
+                        <div class="table-cell branch-cell" id="branch-month"></div>
+                        <div class="table-cell branch-cell" id="branch-day"></div>
+                        <div class="table-cell branch-cell" id="branch-hour"></div>
+                        <div class="table-cell branch-cell" id="branch-taiyuan"></div>
+                        <div class="table-cell branch-cell" id="branch-minggong"></div>
+                        <div class="table-cell branch-cell" id="branch-shengong"></div>
+                    </div>
+                    
+                    <div class="table-row nayin-row" id="nayin-row">
+                        <div class="table-cell nayin-cell" id="nayin-year"></div>
+                        <div class="table-cell nayin-cell" id="nayin-month"></div>
+                        <div class="table-cell nayin-cell" id="nayin-day"></div>
+                        <div class="table-cell nayin-cell" id="nayin-hour"></div>
+                        <div class="table-cell nayin-cell" id="nayin-taiyuan"></div>
+                        <div class="table-cell nayin-cell" id="nayin-minggong"></div>
+                        <div class="table-cell nayin-cell" id="nayin-shengong"></div>
+                    </div>
+                    
+                    <div class="table-row shen-sha-row" id="shen-sha-row">
+                        <div class="table-cell shen-sha-cell" id="shen-sha-year"></div>
+                        <div class="table-cell shen-sha-cell" id="shen-sha-month"></div>
+                        <div class="table-cell shen-sha-cell" id="shen-sha-day"></div>
+                        <div class="table-cell shen-sha-cell" id="shen-sha-hour"></div>
+                        <div class="table-cell shen-sha-cell" id="shen-sha-taiyuan"></div>
+                        <div class="table-cell shen-sha-cell" id="shen-sha-minggong"></div>
+                        <div class="table-cell shen-sha-cell" id="shen-sha-shengong"></div>
+                    </div>
+                </div>
+
+                <!-- 三垣部分 -->
+                <div class="sanyuan-section" id="sanyuan-section">
+                    <div class="section-title">禄命三垣</div>
+                    <div class="sanyuan-container">
+                        <div class="sanyuan-item" id="taiyuan-item">
+                            <div class="sanyuan-name">胎元</div>
+                            <div class="sanyuan-ganzhi" id="taiyuan-ganzhi"></div>
+                            <div class="sanyuan-nayin" id="taiyuan-nayin"></div>
+                            <div class="sanyuan-changsheng" id="taiyuan-changsheng"></div>
+                        </div>
+                        <div class="sanyuan-item" id="minggong-item">
+                            <div class="sanyuan-name">命宫</div>
+                            <div class="sanyuan-ganzhi" id="minggong-ganzhi"></div>
+                            <div class="sanyuan-nayin" id="minggong-nayin"></div>
+                            <div class="sanyuan-changsheng" id="minggong-changsheng"></div>
+                        </div>
+                        <div class="sanyuan-item" id="shengong-item">
+                            <div class="sanyuan-name">身宫</div>
+                            <div class="sanyuan-ganzhi" id="shengong-ganzhi"></div>
+                            <div class="sanyuan-nayin" id="shengong-nayin"></div>
+                            <div class="sanyuan-changsheng" id="shengong-changsheng"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 十二长生详细显示 -->
+                <div class="changsheng-section" id="changsheng-section">
+                    <div class="section-title">十二长生</div>
+                    <div class="changsheng-grid">
+                        <div class="changsheng-item">
+                            <div class="changsheng-title">自坐长生</div>
+                            <div class="changsheng-content" id="self-changsheng"></div>
+                        </div>
+                        <div class="changsheng-item">
+                            <div class="changsheng-title">年纳音坐支长生</div>
+                            <div class="changsheng-content" id="nayin-changsheng"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 大运小运流年区域 -->
+                <div class="dayun-section" id="dayun-section">
+                    <div class="section-title">大运小运流年</div>
+                    
+                    <!-- 当前流运标题区 -->
+                    <div class="current-liuyun-section">
+                        <div class="liuyun-item dayun-item">
+                            <div class="liuyun-title" id="current-dayun-title">大运<span id="current-dayun-ganzhi"></span></div>
+                            <div class="liuyun-shensha" id="current-dayun-shensha"></div>
+                        </div>
+                        <div class="liuyun-item xiaoyun-item">
+                            <div class="liuyun-title" id="current-xiaoyun-title">小运<span id="current-xiaoyun-ganzhi"></span></div>
+                            <div class="liuyun-shensha" id="current-xiaoyun-shensha"></div>
+                        </div>
+                        <div class="liuyun-item liunian-item">
+                            <div class="liuyun-title" id="current-liunian-title">流年<span id="current-liunian-ganzhi"></span></div>
+                            <div class="liuyun-shensha" id="current-liunian-shensha"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- 大运横向表格 -->
+                    <div class="dayun-table-container">
+                        <div class="dayun-subtitle">大运（<span id="dayun-direction">顺行</span>）</div>
+                        <div class="dayun-table-scroll">
+                            <table class="dayun-table" id="dayun-table">
+                                <thead>
+                                    <tr class="dayun-header-row">
+                                        <th class="dayun-label-cell">十神</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="dayun-ganzhi-row">
+                                        <td class="dayun-label-cell">大运</td>
+                                    </tr>
+                                    <tr class="dayun-nayin-row">
+                                        <td class="dayun-label-cell">纳音</td>
+                                    </tr>
+                                    <tr class="dayun-age-row">
+                                        <td class="dayun-label-cell">虚岁</td>
+                                    </tr>
+                                    <tr class="dayun-date-row">
+                                        <td class="dayun-label-cell">交运日期</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- 小运横向表格 -->
+                    <div class="xiaoyun-table-container">
+                        <div class="dayun-subtitle">小运</div>
+                        <div class="xiaoyun-table-scroll">
+                            <table class="xiaoyun-table" id="xiaoyun-table">
+                                <thead>
+                                    <tr class="xiaoyun-header-row">
+                                        <th class="dayun-label-cell">十神</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="xiaoyun-ganzhi-row">
+                                        <td class="dayun-label-cell">小运</td>
+                                    </tr>
+                                    <tr class="xiaoyun-nayin-row">
+                                        <td class="dayun-label-cell">纳音</td>
+                                    </tr>
+                                    <tr class="xiaoyun-age-row">
+                                        <td class="dayun-label-cell">虚岁</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 流年显示占位符 -->
+                <div class="dayun-placeholder"></div>
+
+                <!-- 底部功能按钮 -->
+                <div class="bottom-actions">
+                    <button class="action-btn" id="copy-btn">复制</button>
+                    <button class="action-btn" id="note-btn">笔记</button>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" data-page="paipan">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 2 C12 12, 12 12, 22 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 22 C12 12, 12 12, 2 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+                <span class="nav-text">排盘</span>
+            </div>
+            <div class="nav-item" data-page="records" onclick="window.location.href='../records/index.html'">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <line x1="8" y1="9" x2="16" y2="9" stroke="currentColor" stroke-width="2"/>
+                    <line x1="8" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">记录</span>
+            </div>
+            <div class="nav-item" data-page="study">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M4 4 L12 8 L20 4 L20 16 L12 20 L4 16 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <line x1="12" y1="8" x2="12" y2="20" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">学堂</span>
+            </div>
+            <div class="nav-item" data-page="settings" onclick="window.location.href='../用户管理/index.html'">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 2 L12 6 M12 18 L12 22 M2 12 L6 12 M18 12 L22 12" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">设置</span>
+            </div>
+        </nav>
+    </div>
+
+    <script src="../common/database.js"></script>
+    <script src="../common/cloud-api.js"></script>
+    <script src="script.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>用户管理</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <button class="back-btn" onclick="window.location.href='../首页排盘/index.html'">← 返回</button>
+            <h1>用户管理</h1>
+        </header>
+
+        <main class="main-content">
+            <!-- 当前用户状态 -->
+            <div class="card user-status-card">
+                <div class="section-title">当前用户状态</div>
+                <div id="current-user-info">
+                    <div class="user-type">游客模式</div>
+                    <div class="user-tip">创建本地用户后可保存更多数据</div>
+                </div>
+            </div>
+
+            <!-- 用户类型选择 -->
+            <div class="card user-type-card">
+                <div class="section-title">用户类型</div>
+                <div class="user-type-tabs">
+                    <div class="tab active" data-type="local">本地用户</div>
+                    <div class="tab" data-type="cloud">云端用户</div>
+                </div>
+            </div>
+
+            <!-- 创建/登录本地用户 -->
+            <div class="card create-user-card" id="local-user-section">
+                <div class="section-title">本地用户</div>
+                
+                <!-- 标签切换 -->
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-action="create">创建用户</button>
+                    <button class="tab-btn" data-action="login">登录</button>
+                </div>
+                
+                <!-- 创建用户表单 -->
+                <div id="create-form">
+                    <div class="form-group">
+                        <input type="text" id="username" placeholder="请输入用户名" class="input-field">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" placeholder="请输入密码（可选）" class="input-field">
+                    </div>
+                    <button class="btn-primary" id="create-user-btn">创建本地用户</button>
+                    <div class="tip">本地用户只能创建一个，创建后游客数据将自动迁移</div>
+                </div>
+                
+                <!-- 登录表单 -->
+                <div id="login-form" style="display: none;">
+                    <div class="form-group">
+                        <input type="text" id="login-username" placeholder="用户名" class="input-field">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="login-password" placeholder="密码（可选）" class="input-field">
+                    </div>
+                    <button class="btn-primary" id="login-user-btn">登录</button>
+                    <div class="tip">使用已创建的本地用户登录</div>
+                </div>
+            </div>
+
+            <!-- 云端用户部分 -->
+            <div class="card cloud-user-card" id="cloud-user-section" style="display: none;">
+                <div class="section-title">云端用户</div>
+                <div class="cloud-login-options">
+                    <div class="login-option">
+                        <div class="option-icon">📱</div>
+                        <div class="option-title">微信登录</div>
+                        <div class="option-desc">使用微信扫码授权登录</div>
+                        <button class="btn-primary" id="wechat-login-btn">微信登录</button>
+                    </div>
+                    <div class="login-option">
+                        <div class="option-icon">👤</div>
+                        <div class="option-title">游客模式</div>
+                        <div class="option-desc">继续以游客身份使用</div>
+                        <button class="btn-secondary" id="guest-mode-btn">游客模式</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 云端用户信息 -->
+            <div class="card cloud-user-info-card" id="cloud-user-info" style="display: none;">
+                <div class="section-title">云端用户信息</div>
+                <div id="cloud-user-details">
+                    <!-- 动态显示用户信息 -->
+                </div>
+                <div class="import-options">
+                    <div class="section-title">数据导入</div>
+                    <div class="import-option">
+                        <label>
+                            <input type="checkbox" id="import-local-data"> 导入本地用户数据
+                        </label>
+                    </div>
+                    <div class="import-option">
+                        <label>
+                            <input type="checkbox" id="import-guest-data"> 导入游客数据
+                        </label>
+                    </div>
+                    <button class="btn-primary" id="import-data-btn">导入数据</button>
+                </div>
+                <button class="btn-danger" id="cloud-logout-btn">退出云端登录</button>
+            </div>
+
+            <!-- 游客数据管理 -->
+            <div class="card guest-data-card">
+                <div class="section-title">游客数据</div>
+                <div id="guest-data-info">
+                    <div class="data-count">游客记录数：<span id="guest-count">0</span></div>
+                    <button class="btn-secondary" id="view-guest-data-btn">查看游客记录</button>
+                    <button class="btn-danger" id="clear-guest-data-btn">清空游客数据</button>
+                </div>
+            </div>
+
+            <!-- 本地用户数据管理 -->
+            <div class="card local-user-data-card" id="local-user-data-section" style="display: none;">
+                <div class="section-title">本地用户数据</div>
+                <div id="local-user-info">
+                    <div class="user-name">用户：<span id="local-username"></span></div>
+                    <div class="data-count">记录数：<span id="local-count">0</span></div>
+                    <button class="btn-secondary" id="view-local-data-btn">查看记录</button>
+                    <button class="btn-danger" id="logout-btn">退出登录</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 微信登录弹窗 -->
+        <div class="modal" id="wechat-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>微信登录</h3>
+                    <button class="close-btn" id="close-wechat-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="qrcode-container">
+                        <div id="qrcode-placeholder">
+                            <div class="loading">正在生成二维码...</div>
+                        </div>
+                        <div class="qrcode-tip">请使用微信扫描二维码</div>
+                    </div>
+                    <div class="login-status" id="login-status">
+                        <div class="status-text">等待扫码...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <div class="nav-item" onclick="window.location.href='../首页排盘/index.html'">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 2 C12 12, 12 12, 22 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 22 C12 12, 12 12, 2 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+                <span class="nav-text">排盘</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../records/index.html'">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <line x1="8" y1="9" x2="16" y2="9" stroke="currentColor" stroke-width="2"/>
+                    <line x1="8" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">记录</span>
+            </div>
+            <div class="nav-item active">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 2 L12 6 M12 18 L12 22 M2 12 L6 12 M18 12 L22 12" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">设置</span>
+            </div>
+        </nav>
+    </div>
+
+    <script src="../common/database.js"></script>
+    <script src="../common/cloud-api.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
