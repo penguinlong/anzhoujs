@@ -200,6 +200,7 @@ function initEventListeners() {
     document.getElementById('back-btn').addEventListener('click', () => window.history.back());
     document.getElementById('copy-btn').addEventListener('click', copyResult);
     document.getElementById('note-btn').addEventListener('click', addNote);
+    document.getElementById('delete-btn').addEventListener('click', showDeleteConfirm);
     
     document.querySelectorAll('.analysis-tab').forEach(tab => {
         tab.addEventListener('click', function() {
@@ -209,6 +210,25 @@ function initEventListeners() {
     });
     
     document.getElementById('dayun-liunian-btn').addEventListener('click', toggleDayunLiunianMode);
+    
+    // 笔记弹窗事件
+    document.getElementById('note-cancel-btn').addEventListener('click', hideNoteModal);
+    document.getElementById('note-save-btn').addEventListener('click', saveNote);
+    document.getElementById('note-modal').addEventListener('click', function(e) {
+        if (e.target === this) hideNoteModal();
+    });
+    
+    // 删除弹窗事件
+    document.getElementById('cancel-delete').addEventListener('click', hideDeleteConfirm);
+    document.getElementById('confirm-delete').addEventListener('click', async function() {
+        if (deleteTargetId) {
+            await deleteCurrentRecord();
+            hideDeleteConfirm();
+        }
+    });
+    document.getElementById('delete-modal').addEventListener('click', function(e) {
+        if (e.target === this) hideDeleteConfirm();
+    });
 }
 
 // ===== 从URL加载记录 =====
@@ -858,9 +878,61 @@ function copyResult() {
 }
 
 // ===== 添加笔记 =====
+let noteTargetId = null;
+
 function addNote() {
     if (!currentRecord) return;
-    window.location.href = `../records/index.html?recordId=${currentRecord.id}&action=note`;
+    noteTargetId = currentRecord.id;
+    const textarea = document.getElementById('note-textarea');
+    textarea.value = currentRecord.note || '';
+    document.getElementById('note-modal').style.display = 'flex';
+}
+
+function hideNoteModal() {
+    noteTargetId = null;
+    document.getElementById('note-textarea').value = '';
+    document.getElementById('note-modal').style.display = 'none';
+}
+
+async function saveNote() {
+    if (!noteTargetId) return;
+    const noteText = document.getElementById('note-textarea').value;
+    try {
+        const record = await db.getRecord(noteTargetId);
+        if (record) {
+            record.note = noteText;
+            await db.updateRecord(noteTargetId, record);
+            currentRecord.note = noteText;
+        }
+        hideNoteModal();
+    } catch (err) {
+        console.error('保存笔记失败:', err);
+        alert('保存笔记失败');
+    }
+}
+
+// ===== 删除记录 =====
+let deleteTargetId = null;
+
+function showDeleteConfirm() {
+    if (!currentRecord) return;
+    deleteTargetId = currentRecord.id;
+    document.getElementById('delete-modal').style.display = 'flex';
+}
+
+function hideDeleteConfirm() {
+    deleteTargetId = null;
+    document.getElementById('delete-modal').style.display = 'none';
+}
+
+async function deleteCurrentRecord() {
+    if (!deleteTargetId) return;
+    try {
+        await db.deleteRecord(deleteTargetId);
+        window.location.href = '../records/index.html';
+    } catch (err) {
+        console.error('删除记录失败:', err);
+    }
 }
 
 // ===== 查找当前大运索引 =====

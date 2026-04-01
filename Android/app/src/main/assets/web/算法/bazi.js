@@ -71,12 +71,8 @@ class BaziCalculator {
 
   calculateFromLunar(year, month, day, hour = 12, minute = 0, isLeapMonth = false, longitude = 120.0, useTrueSolar = true) {
     const { year: y, month: m, day: d, hour: h, minute: min } = handleMidnightCrossing(year, month, day, hour, minute);
-    let lunar;
-    if (isLeapMonth) {
-      lunar = LunarCalendar.Lunar.fromYmdHms(y, m + 100, d, h, min, 0);
-    } else {
-      lunar = LunarCalendar.Lunar.fromYmdHms(y, m, d, h, min, 0);
-    }
+    let lunarMonth = isLeapMonth ? -m : m;
+    const lunar = LunarCalendar.Lunar.fromYmdHms(y, lunarMonth, d, h, min, 0);
     const solar = lunar.getSolar();
     return this._calculate(solar, longitude, useTrueSolar, year, month, day, hour, minute, isLeapMonth);
   }

@@ -4,6 +4,8 @@ import android.content.res.AssetManager;
 import fi.iki.elonen.NanoHTTPD;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 public class LocalServer extends NanoHTTPD {
     private final AssetManager assetManager;
@@ -20,10 +22,16 @@ public class LocalServer extends NanoHTTPD {
         if (uri.equals("/") || uri.isEmpty()) {
             uri = "/首页排盘/index.html";
         }
-
+        
         String assetPath = "web" + uri;
         if (assetPath.startsWith("/")) {
             assetPath = assetPath.substring(1);
+        }
+        
+        try {
+            assetPath = URLDecoder.decode(assetPath, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
         
         try {
@@ -33,7 +41,7 @@ public class LocalServer extends NanoHTTPD {
             return newChunkedResponse(Response.Status.OK, mimeType, 
                 new java.io.ByteArrayInputStream(content));
         } catch (IOException e) {
-            String errorMsg = "File not found: " + uri;
+            String errorMsg = "File not found: " + assetPath;
             return newChunkedResponse(Response.Status.NOT_FOUND, "text/plain", 
                 new java.io.ByteArrayInputStream(errorMsg.getBytes()));
         }
@@ -75,6 +83,12 @@ public class LocalServer extends NanoHTTPD {
             return "font/woff2";
         } else if (path.endsWith(".ttf")) {
             return "font/ttf";
+        } else if (path.endsWith(".mjs")) {
+            return "application/javascript";
+        } else if (path.endsWith(".epub")) {
+            return "application/epub+zip";
+        } else if (path.endsWith(".wasm")) {
+            return "application/wasm";
         }
         return "application/octet-stream";
     }

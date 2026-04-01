@@ -302,6 +302,7 @@
                 <button class="action-btn" id="back-btn">返回</button>
                 <button class="action-btn" id="copy-btn">复制</button>
                 <button class="action-btn" id="note-btn">笔记</button>
+                <button class="action-btn" id="delete-btn">删除</button>
             </div>
         </main>
 
@@ -329,6 +330,13 @@
                 </svg>
                 <span class="nav-text">专业</span>
             </div>
+            <div class="nav-item" data-page="study" onclick="window.location.href='../学堂/index.html'">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M12 2 L12 22 M2 12 L22 12" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+                <span class="nav-text">学堂</span>
+            </div>
             <div class="nav-item" data-page="settings" onclick="window.location.href='../用户管理/index.html'">
                 <svg class="nav-icon" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -337,6 +345,28 @@
                 <span class="nav-text">设置</span>
             </div>
         </nav>
+    </div>
+
+    <div class="modal" id="delete-modal" style="display: none;">
+        <div class="modal-content">
+            <p class="modal-title">确认删除</p>
+            <p class="modal-message">确定要删除这条记录吗？此操作不可撤销。</p>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancel-delete">取消</button>
+                <button class="modal-btn confirm" id="confirm-delete">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="note-modal" style="display: none;">
+        <div class="modal-content note-modal-content">
+            <p class="modal-title">记录笔记</p>
+            <textarea id="note-textarea" class="note-textarea" placeholder="请输入笔记内容..."></textarea>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="note-cancel-btn">退出</button>
+                <button class="modal-btn confirm save" id="note-save-btn">保存</button>
+            </div>
+        </div>
     </div>
 
     <script src="../common/database.js"></script>

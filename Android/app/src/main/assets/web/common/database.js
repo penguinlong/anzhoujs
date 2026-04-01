@@ -4,8 +4,9 @@
  */
 
 const DB_NAME = 'luming_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'records';
+const READING_PROGRESS_STORE = 'reading_progress';
 
 // 云端数据库配置（预留）
 const CLOUD_CONFIG = {
@@ -56,6 +57,16 @@ class LumingDatabase {
                     store.createIndex('actualTime', 'actualTime', { unique: false }); // 实际时间索引
                     store.createIndex('gender', 'gender', { unique: false }); // 性别索引
                     store.createIndex('userId', 'userId', { unique: false }); // 用户ID索引
+                }
+
+                if (!db.objectStoreNames.contains(READING_PROGRESS_STORE)) {
+                    const progressStore = db.createObjectStore(READING_PROGRESS_STORE, {
+                        keyPath: 'id',
+                        autoIncrement: true
+                    });
+                    
+                    progressStore.createIndex('book_id', 'book_id', { unique: true });
+                    progressStore.createIndex('last_read', 'last_read', { unique: false });
                 }
             };
         });
@@ -238,6 +249,79 @@ class LumingDatabase {
             const request = store.count();
             
             request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    // ===== 阅读进度方法 =====
+    
+    // 保存阅读进度
+    async saveReadingProgress(progressData) {
+        return new Promise((resolve, reject) => {
+            const tx = this.db.transaction(READING_PROGRESS_STORE, 'readwrite');
+            const store = tx.objectStore(READING_PROGRESS_STORE);
+            
+            progressData.last_read = new Date().toISOString();
+            
+            const getRequest = store.index('book_id').get(progressData.book_id);
+            
+            getRequest.onsuccess = () => {
+                const existing = getRequest.result;
+                if (existing) {
+                    progressData.id = existing.id;
+                    const updateRequest = store.put(progressData);
+                    updateRequest.onsuccess = () => resolve(progressData);
+                    updateRequest.onerror = () => reject(updateRequest.error);
+                } else {
+                    const addRequest = store.add(progressData);
+                    addRequest.onsuccess = () => resolve(progressData);
+                    addRequest.onerror = () => reject(addRequest.error);
+                }
+            };
+            getRequest.onerror = () => reject(getRequest.error);
+        });
+    }
+
+    // 获取阅读进度
+    async getReadingProgress(bookId) {
+        return new Promise((resolve, reject) => {
+            const tx = this.db.transaction(READING_PROGRESS_STORE, 'readonly');
+            const store = tx.objectStore(READING_PROGRESS_STORE);
+            const index = store.index('book_id');
+            const request = index.get(bookId);
+            
+            request.onsuccess = () => resolve(request.result || null);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    // 获取所有阅读进度
+    async getAllReadingProgress() {
+        return new Promise((resolve, reject) => {
+            const tx = this.db.transaction(READING_PROGRESS_STORE, 'readonly');
+            const store = tx.objectStore(READING_PROGRESS_STORE);
+            const request = store.getAll();
+            
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    // 删除阅读进度
+    async deleteReadingProgress(bookId) {
+        return new Promise((resolve, reject) => {
+            const tx = this.db.transaction(READING_PROGRESS_STORE, 'readwrite');
+            const store = tx.objectStore(READING_PROGRESS_STORE);
+            const index = store.index('book_id');
+            const request = index.get(bookId);
+            
+            request.onsuccess = () => {
+                const record = request.result;
+                if (record) {
+                    store.delete(record.id);
+                }
+                resolve(true);
+            };
             request.onerror = () => reject(request.error);
         });
     }

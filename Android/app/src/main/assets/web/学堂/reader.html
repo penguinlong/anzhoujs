@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>阅读器</title>
+    <link rel="stylesheet" href="reader.css">
+</head>
+<body>
+    <div id="reader-app">
+        <div id="viewer" class="viewer"></div>
+
+        <div class="reader-controls" id="reader-controls">
+            <div class="top-bar">
+                <button class="icon-btn" id="back-btn" title="返回">←</button>
+                <span id="book-title" class="book-title">加载中...</span>
+                <div class="top-actions">
+                    <button class="icon-btn" id="zoom-btn" title="缩放">⊕</button>
+                    <button class="icon-btn" id="font-btn" title="字体">A</button>
+                    <button class="icon-btn" id="menu-btn" title="目录">☰</button>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="nav-controls">
+                <button class="nav-btn" id="prev-btn">‹ 上一页</button>
+                <div class="progress-info">
+                    <span id="progress-text">0%</span>
+                </div>
+                <button class="nav-btn" id="next-btn">下一页 ›</button>
+            </div>
+        </div>
+
+        <div class="toc-panel" id="toc-panel">
+            <div class="toc-header">
+                <h3>目录</h3>
+                <button class="icon-btn" id="close-toc">×</button>
+            </div>
+            <div class="toc-content" id="toc-content">
+                <div class="loading">加载目录...</div>
+            </div>
+        </div>
+
+        <div class="font-panel" id="font-panel">
+            <div class="font-header">
+                <h3>字体大小</h3>
+            </div>
+            <div class="font-controls">
+                <button class="font-btn" id="font-decrease" onclick="reader.decreaseFontSize()">A-</button>
+                <span id="font-size-display">16px</span>
+                <button class="font-btn" id="font-increase" onclick="reader.increaseFontSize()">A+</button>
+            </div>
+        </div>
+
+        <div class="zoom-panel" id="zoom-panel">
+            <div class="zoom-header">
+                <h3>缩放比例</h3>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoom-out" onclick="reader.zoomOut()">−</button>
+                <span id="zoom-level">100%</span>
+                <button class="zoom-btn" id="zoom-in" onclick="reader.zoomIn()">+</button>
+            </div>
+            <div class="zoom-fit">
+                <button class="zoom-fit-btn" onclick="reader.fitToScreen()">适应屏幕</button>
+            </div>
+        </div>
+
+        <div class="overlay" id="overlay"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.88/dist/epub.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <script src="../common/database.js"></script>
+    <script src="reader.js"></script>
+</body>
+</html>

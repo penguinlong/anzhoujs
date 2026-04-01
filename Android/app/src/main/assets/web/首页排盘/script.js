@@ -201,15 +201,36 @@ function updateMonths() {
     const currentMonth = monthSelect.value;
     
     monthSelect.innerHTML = '';
-    for (let m = 1; m <= 12; m++) {
-        const option = document.createElement('option');
-        option.value = m;
-        option.textContent = m + '月';
-        monthSelect.appendChild(option);
+    
+    if (currentDateType === 'lunar') {
+        const year = parseInt(document.getElementById('year-select').value);
+        const leapMonth = getLunarLeapMonth(year);
+        
+        for (let m = 1; m <= 12; m++) {
+            const option = document.createElement('option');
+            if (leapMonth === m) {
+                option.value = -m;
+                option.textContent = m + '月(闰)';
+            } else {
+                option.value = m;
+                option.textContent = m + '月';
+            }
+            monthSelect.appendChild(option);
+        }
+    } else {
+        for (let m = 1; m <= 12; m++) {
+            const option = document.createElement('option');
+            option.value = m;
+            option.textContent = m + '月';
+            monthSelect.appendChild(option);
+        }
     }
     
-    if (currentMonth && currentMonth <= 12) {
-        monthSelect.value = currentMonth;
+    if (currentMonth) {
+        const absCurrent = Math.abs(parseInt(currentMonth));
+        if (absCurrent <= 12) {
+            monthSelect.value = currentMonth;
+        }
     }
     updateDays();
 }
@@ -222,10 +243,11 @@ function updateDays() {
     
     const year = parseInt(yearSelect.value);
     const month = parseInt(monthSelect.value);
+    const absMonth = Math.abs(month);
     
     let daysInMonth = currentDateType === 'lunar' 
-        ? getLunarDaysInMonth(year, month) 
-        : getSolarDaysInMonth(year, month);
+        ? getLunarDaysInMonth(year, absMonth) 
+        : getSolarDaysInMonth(year, absMonth);
     
     daySelect.innerHTML = '';
     for (let d = 1; d <= daysInMonth; d++) {
@@ -235,7 +257,7 @@ function updateDays() {
         daySelect.appendChild(option);
     }
     
-    if (currentDay && currentDay <= daysInMonth) {
+    if (currentDay && parseInt(currentDay) <= daysInMonth) {
         daySelect.value = currentDay;
     }
 }
@@ -248,20 +270,59 @@ function getSolarDaysInMonth(year, month) {
 }
 
 function getLunarDaysInMonth(year, month) {
+    const absMonth = Math.abs(month);
     const leapMonth = getLunarLeapMonth(year);
-    if (month === leapMonth) return 29;
-    if (leapMonth === 0 || month < leapMonth) {
-        return month % 2 === 0 ? 30 : 29;
+    if (absMonth === leapMonth) return 29;
+    if (leapMonth === 0 || absMonth < leapMonth) {
+        return absMonth % 2 === 0 ? 30 : 29;
     } else {
-        return month % 2 === 0 ? 29 : 30;
+        return absMonth % 2 === 0 ? 29 : 30;
     }
 }
 
 function getLunarLeapMonth(year) {
     const leapMonths = {
-        1990: 8, 1995: 8, 1998: 5, 2001: 4, 2004: 2, 2006: 7, 
+        1990: 6, 1993: 3, 1995: 8, 1998: 5, 2001: 4, 2004: 2, 2006: 7,
         2009: 5, 2012: 4, 2014: 9, 2017: 6, 2020: 4, 2023: 2,
-        2025: 6, 2028: 5
+        2025: 6, 2028: 5, 2031: 3, 2033: 11, 2036: 6, 2039: 5, 2042: 2,
+        2044: 7, 2047: 5, 2050: 3, 2052: 8, 2055: 6, 2058: 4, 2061: 3,
+        2063: 7, 2066: 5, 2069: 4, 2071: 11, 2074: 6, 2077: 5, 2080: 3,
+        2082: 8, 2085: 6, 2088: 4, 2091: 3, 2093: 7, 2096: 5, 2099: 4,
+        2101: 9, 2104: 6, 2107: 5, 2110: 3, 2112: 8, 2115: 6, 2118: 4,
+        2121: 3, 2123: 7, 2126: 5, 2129: 4, 2132: 2, 2134: 6, 2137: 5,
+        2140: 3, 2142: 7, 2145: 5, 2148: 4, 2151: 3, 2153: 7, 2156: 5,
+        2159: 4, 2162: 2, 2164: 6, 2167: 5, 2170: 3, 2172: 7, 2175: 5,
+        2178: 4, 2181: 3, 2183: 6, 2186: 5, 2189: 3, 2191: 7, 2194: 5,
+        2197: 4, 2200: 3, 2202: 6, 2205: 5, 2208: 3, 2210: 7, 2213: 5,
+        2216: 4, 2219: 3, 2221: 6, 2224: 5, 2227: 3, 2229: 8, 2232: 5,
+        2235: 4, 2238: 3, 2240: 7, 2243: 5, 2246: 4, 2249: 3, 2251: 7,
+        2254: 5, 2257: 4, 2260: 3, 2262: 6, 2265: 5, 2268: 3, 2270: 7,
+        2273: 5, 2276: 4, 2279: 3, 2281: 6, 2284: 5, 2287: 3, 2289: 8,
+        2292: 5, 2295: 4, 2298: 3, 2300: 6, 2303: 5, 2306: 3, 2308: 8,
+        2311: 5, 2314: 4, 2317: 3, 2319: 6, 2322: 5, 2325: 3, 2327: 8,
+        2330: 5, 2333: 4, 2336: 3, 2338: 7, 2341: 5, 2344: 4, 2347: 3,
+        2349: 7, 2352: 5, 2355: 4, 2358: 3, 2360: 6, 2363: 5, 2366: 3,
+        2368: 8, 2371: 5, 2374: 4, 2377: 3, 2379: 6, 2382: 5, 2385: 3,
+        2387: 8, 2390: 5, 2393: 4, 2396: 3, 2398: 7, 2401: 5, 2404: 4,
+        2407: 3, 2409: 6, 2412: 5, 2415: 3, 2417: 8, 2420: 5, 2423: 4,
+        2426: 3, 2428: 6, 2431: 5, 2434: 3, 2436: 7, 2439: 5, 2442: 4,
+        2445: 3, 2447: 7, 2450: 5, 2453: 4, 2456: 3, 2458: 6, 2461: 5,
+        2464: 3, 2466: 8, 2469: 5, 2472: 4, 2475: 3, 2477: 6, 2480: 5,
+        2483: 3, 2485: 8, 2488: 5, 2491: 4, 2494: 3, 2496: 6, 2499: 5,
+        2502: 3, 2504: 7, 2507: 5, 2510: 4, 2513: 3, 2515: 7, 2518: 5,
+        2521: 4, 2524: 3, 2526: 6, 2529: 5, 2532: 3, 2534: 8, 2537: 5,
+        2540: 4, 2543: 3, 2545: 6, 2548: 5, 2551: 3, 2553: 7, 2556: 5,
+        2559: 4, 2562: 3, 2564: 7, 2567: 5, 2570: 4, 2573: 3, 2575: 6,
+        2578: 5, 2581: 3, 2583: 8, 2586: 5, 2589: 4, 2592: 3, 2594: 6,
+        2597: 5, 2600: 3, 2602: 7, 2605: 5, 2608: 4, 2611: 3, 2613: 7,
+        2616: 5, 2619: 4, 2622: 3, 2624: 6, 2627: 5, 2630: 3, 2632: 8,
+        2635: 5, 2638: 4, 2641: 3, 2643: 6, 2646: 5, 2649: 3, 2651: 7,
+        2654: 5, 2657: 4, 2660: 3, 2662: 7, 2665: 5, 2668: 4, 2671: 3,
+        2673: 6, 2676: 5, 2679: 3, 2681: 8, 2684: 5, 2687: 4, 2690: 3,
+        2692: 6, 2695: 5, 2698: 3, 2700: 7, 2703: 5, 2706: 4, 2709: 3,
+        2711: 7, 2714: 5, 2717: 4, 2720: 3, 2722: 6, 2725: 5, 2728: 3,
+        2730: 8, 2733: 5, 2736: 4, 2739: 3, 2741: 6, 2744: 5, 2747: 3,
+        2749: 7, 2752: 5
     };
     return leapMonths[year] || 0;
 }
@@ -284,8 +345,7 @@ function initButtonGroups() {
             e.target.classList.add('active');
             
             currentDateType = e.target.dataset.value;
-            document.getElementById('leap-month-label').classList.toggle('hidden', currentDateType === 'solar');
-            updateDays();
+            updateMonths();
         }
     });
 }
@@ -312,16 +372,17 @@ async function calculateBazi() {
         return;
     }
     
-    console.log('calculateBazi called with:', { year, month, day, hour, minute, longitude, useTrueSolar });
-    
     const isLunar = currentDateType === 'lunar';
-    const isLeapMonth = document.getElementById('leap-month')?.checked || false;
+    const isLeapMonth = month < 0;
+    const absMonth = Math.abs(month);
+    
+    console.log('calculateBazi called with:', { year, month: absMonth, day, hour, minute, isLunar, isLeapMonth });
     
     try {
         showLoading(true);
         const algo = await loadAlgorithmModules();
         
-        const baziResult = algo.calculateBazi(year, month, day, hour, minute, {
+        const baziResult = algo.calculateBazi(year, absMonth, day, hour, minute, {
             isLunar,
             isLeapMonth,
             longitude,
@@ -335,7 +396,7 @@ async function calculateBazi() {
         baziResult.lunar_date = baziResult.lunar_date || '未知';
         
         displayResult(baziResult);
-        await saveRecord({ name, gender, date_type: currentDateType, solar_year: year, solar_month: month, solar_day: day, lunar_year: year, lunar_month: month, lunar_day: day, is_leap_month: isLeapMonth, hour, minute, longitude, use_true_solar: useTrueSolar }, baziResult);
+        await saveRecord({ name, gender, date_type: currentDateType, solar_year: year, solar_month: absMonth, solar_day: day, lunar_year: year, lunar_month: absMonth, lunar_day: day, is_leap_month: isLeapMonth, hour, minute, longitude, use_true_solar: useTrueSolar }, baziResult);
         
     } catch (error) {
         alert('计算失败: ' + error.message);
