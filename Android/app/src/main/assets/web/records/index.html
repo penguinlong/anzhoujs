@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>禄命排盘 - 记录</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>用户列表</h1>
+        </header>
+
+        <main class="main-content">
+            <div class="search-bar">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <line x1="16" y1="16" x2="22" y2="22" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <input type="text" id="search-input" placeholder="请输入搜索的内容" class="search-input">
+                </div>
+                <button class="filter-btn" id="filter-btn">筛选</button>
+            </div>
+
+            <div class="category-tabs">
+                <button class="tab active" data-type="all">全部</button>
+                <button class="tab" data-type="solar">公历</button>
+                <button class="tab" data-type="lunar">农历</button>
+                <button class="tab" data-type="ganzhi">四柱</button>
+            </div>
+
+            <div class="records-list" id="records-list">
+            </div>
+
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <svg class="empty-icon" viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <line x1="8" y1="9" x2="16" y2="9" stroke="currentColor" stroke-width="2"/>
+                    <line x1="8" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <p class="empty-text">暂无记录</p>
+                <p class="empty-hint">排盘后自动保存，记录将显示在这里</p>
+            </div>
+        </main>
+
+        <button class="fab" id="add-btn" title="手动添加记录">
+            <svg viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </button>
+
+        <nav class="bottom-nav">
+            <div class="nav-item" data-page="paipan" onclick="window.location.href='../首页排盘/index.html'">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 2 C12 12, 12 12, 22 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 22 C12 12, 12 12, 2 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+                <span class="nav-text">排盘</span>
+            </div>
+            <div class="nav-item active" data-page="records">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <line x1="8" y1="9" x2="16" y2="9" stroke="currentColor" stroke-width="2"/>
+                    <line x1="8" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">记录</span>
+            </div>
+            <div class="nav-item" data-page="study">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M4 4 L12 8 L20 4 L20 16 L12 20 L4 16 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <line x1="12" y1="8" x2="12" y2="20" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">学堂</span>
+            </div>
+            <div class="nav-item" data-page="settings">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 2 L12 6 M12 18 L12 22 M2 12 L6 12 M18 12 L22 12" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="nav-text">设置</span>
+            </div>
+        </nav>
+    </div>
+
+    <div class="modal" id="delete-modal" style="display: none;">
+        <div class="modal-content">
+            <p class="modal-title">确认删除</p>
+            <p class="modal-message">确定要删除这条记录吗？此操作不可撤销。</p>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancel-delete">取消</button>
+                <button class="modal-btn confirm" id="confirm-delete">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="action-menu" style="display: none;">
+        <div class="modal-content action-menu-content">
+            <p class="modal-title">选择操作</p>
+            <div class="action-menu-buttons">
+                <button class="action-menu-btn" id="action-note-btn">
+                    <span class="action-icon">📝</span>
+                    <span>记录笔记</span>
+                </button>
+                <button class="action-menu-btn danger" id="action-delete-btn">
+                    <span class="action-icon">🗑️</span>
+                    <span>删除记录</span>
+                </button>
+            </div>
+            <button class="action-menu-cancel" id="action-cancel-btn">取消</button>
+        </div>
+    </div>
+
+    <div class="modal" id="note-modal" style="display: none;">
+        <div class="modal-content note-modal-content">
+            <p class="modal-title">记录笔记</p>
+            <textarea id="note-textarea" class="note-textarea" placeholder="请输入笔记内容..."></textarea>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="note-cancel-btn">退出</button>
+                <button class="modal-btn confirm save" id="note-save-btn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../common/database.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
