@@ -13,7 +13,6 @@
         </header>
 
         <main class="main-content">
-            <!-- 搜索框 -->
             <div class="search-bar">
                 <div class="search-input-wrapper">
                     <svg class="search-icon" viewBox="0 0 24 24">
@@ -25,7 +24,6 @@
                 <button class="filter-btn" id="filter-btn">筛选</button>
             </div>
 
-            <!-- 分类标签 -->
             <div class="category-tabs">
                 <button class="tab active" data-type="all">全部</button>
                 <button class="tab" data-type="solar">公历</button>
@@ -33,12 +31,9 @@
                 <button class="tab" data-type="ganzhi">四柱</button>
             </div>
 
-            <!-- 记录列表 -->
             <div class="records-list" id="records-list">
-                <!-- 记录将通过 JavaScript 动态生成 -->
             </div>
 
-            <!-- 空状态 -->
             <div class="empty-state" id="empty-state" style="display: none;">
                 <svg class="empty-icon" viewBox="0 0 24 24">
                     <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -50,7 +45,6 @@
             </div>
         </main>
 
-        <!-- 浮动按钮 -->
         <button class="fab" id="add-btn" title="手动添加记录">
             <svg viewBox="0 0 24 24">
                 <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2"/>
@@ -58,7 +52,6 @@
             </svg>
         </button>
 
-        <!-- 底部导航栏 -->
         <nav class="bottom-nav">
             <div class="nav-item" data-page="paipan" onclick="window.location.href='../首页排盘/index.html'">
                 <svg class="nav-icon" viewBox="0 0 24 24">
@@ -93,14 +86,41 @@
         </nav>
     </div>
 
-    <!-- 删除确认对话框 -->
     <div class="modal" id="delete-modal" style="display: none;">
         <div class="modal-content">
             <p class="modal-title">确认删除</p>
-            <p class="modal-message">确定要删除这条记录吗？</p>
+            <p class="modal-message">确定要删除这条记录吗？此操作不可撤销。</p>
             <div class="modal-actions">
                 <button class="modal-btn cancel" id="cancel-delete">取消</button>
                 <button class="modal-btn confirm" id="confirm-delete">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="action-menu" style="display: none;">
+        <div class="modal-content action-menu-content">
+            <p class="modal-title">选择操作</p>
+            <div class="action-menu-buttons">
+                <button class="action-menu-btn" id="action-note-btn">
+                    <span class="action-icon">📝</span>
+                    <span>记录笔记</span>
+                </button>
+                <button class="action-menu-btn danger" id="action-delete-btn">
+                    <span class="action-icon">🗑️</span>
+                    <span>删除记录</span>
+                </button>
+            </div>
+            <button class="action-menu-cancel" id="action-cancel-btn">取消</button>
+        </div>
+    </div>
+
+    <div class="modal" id="note-modal" style="display: none;">
+        <div class="modal-content note-modal-content">
+            <p class="modal-title">记录笔记</p>
+            <textarea id="note-textarea" class="note-textarea" placeholder="请输入笔记内容..."></textarea>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="note-cancel-btn">退出</button>
+                <button class="modal-btn confirm save" id="note-save-btn">保存</button>
             </div>
         </div>
     </div>
