@@ -128,7 +128,7 @@ async function callCalculateAPI(data) {
             data.minute,
             {
                 isLunar: data.date_type === 'lunar',
-                isLeapMonth: false,
+                isLeapMonth: data.is_leap_month || false,
                 longitude: data.longitude || 120,
                 useTrueSolar: data.use_true_solar !== false
             }
@@ -280,26 +280,32 @@ async function displayRecordData(record) {
     const data = record.fullData || record;
     const originalSolar = data.original_solar || {};
     
-    // 从fullData或record中提取正确的字段
-    const solarYear = originalSolar.year || (data.solar_date ? parseInt(data.solar_date.split('-')[0]) : data.solarYear);
-    const solarMonth = originalSolar.month || (data.solar_date ? parseInt(data.solar_date.split('-')[1]) : data.solarMonth);
-    const solarDay = originalSolar.day || (data.solar_date ? parseInt(data.solar_date.split('-')[2]) : data.solarDay);
+    // 从fullData或record中提取正确的字段（同时检查驼峰和下划线格式）
+    const solarDateStr = data.solarDate || data.solar_date || '';
+    const solarYear = originalSolar.year || (solarDateStr ? parseInt(solarDateStr.split('-')[0]) : data.solarYear);
+    const solarMonth = originalSolar.month || (solarDateStr ? parseInt(solarDateStr.split('-')[1]) : data.solarMonth);
+    const solarDay = originalSolar.day || (solarDateStr ? parseInt(solarDateStr.split('-')[2]) : data.solarDay);
     const hour = originalSolar.hour !== undefined ? originalSolar.hour : (data.hour !== undefined ? (typeof data.hour === 'number' ? data.hour : 12) : 12);
     const minute = originalSolar.minute || 0;
     const gender = data.gender === '男' ? 'male' : (data.gender === '女' ? 'female' : (data.gender || 'male'));
     
-    console.log('displayRecordData:', { data, originalSolar, solarYear, solarMonth, solarDay, hour, minute });
+    // dateType 字段在 record 中是驼峰命名，从 record 读取
+    const dateType = record.dateType || data.dateType || 'solar';
+    const isLeapMonth = record.is_leap_month || data.is_leap_month || false;
+    
+    console.log('displayRecordData:', { data, originalSolar, solarYear, solarMonth, solarDay, hour, minute, dateType, isLeapMonth });
     
     // 1. 调用排盘API
     const calculateData = {
         name: data.name || '匿名',
         gender: gender,
-        date_type: data.dateType === 'lunar' ? 'lunar' : 'solar',
+        date_type: dateType === 'lunar' ? 'lunar' : 'solar',
         solar_year: solarYear,
         solar_month: solarMonth,
         solar_day: solarDay,
         hour: hour,
         minute: minute,
+        is_leap_month: isLeapMonth,
         longitude: data.longitude || 120,
         use_true_solar: data.use_true_solar !== false
     };
@@ -499,10 +505,12 @@ function displaySizhu(result) {
             branchCell.className = `table-cell branch-cell ${WUXING_COLORS[ZHI_WUXING[branch]] || ''}`;
         }
         
-        // 十神（显示为标签）
+        // 十神（显示与年柱的十神关系）
         const shizhiCell = document.getElementById(`shizhi-${pillar}`);
         if (shizhiCell) {
-            shizhiCell.textContent = sanyuanLabels[pillar] || '';
+            const yearGan = result.year ? result.year.charAt(0) : '';
+            const taiyuanGan = data.ganzhi ? data.ganzhi.charAt(0) : '';
+            shizhiCell.textContent = yearGan && taiyuanGan ? getTenGod(yearGan, taiyuanGan) : (sanyuanLabels[pillar] || '');
         }
         
         // 藏干

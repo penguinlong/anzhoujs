@@ -47,6 +47,14 @@ class DayunXiaoyunCalculator {
     return jieqiDates;
   }
 
+  /**
+   * 《五行精纪》起运岁数计算
+   * 原文：运行则一辰十岁，折除乃三日为年
+   * 古法换算：
+   * - 3天 = 36时辰 = 1岁
+   * - 1天 = 12时辰 = 4个月
+   * - 1时辰 = 10天
+   */
   calculateStartAge(birthSolar, direction) {
     const birthDate = new Date(
       birthSolar.year,
@@ -81,7 +89,7 @@ class DayunXiaoyunCalculator {
     }
 
     if (!targetJieqi) {
-      return { years: 1, months: 0, days: 0, total_days: 3, target_jieqi: null };
+      return { years: 1, months: 0, days: 0, total_hours: 30, target_jieqi: null, jiaoyun_date: null };
     }
 
     let diff;
@@ -91,12 +99,23 @@ class DayunXiaoyunCalculator {
       diff = birthDate - targetJieqi.date;
     }
 
-    const totalDays = Math.floor(diff / (1000 * 60 * 60 * 24));
-    let years = Math.floor(totalDays / 3);
-    const remainingDays = totalDays % 3;
-    let months = remainingDays * 4;
-    let days = 0;
+    // 《五行精纪》古法：全部转换为时辰计算
+    // 1天 = 12时辰，1时辰 = 2小时
+    const totalHours = diff / (1000 * 60 * 60); // 总小时数
+    const totalShichen = totalHours / 2; // 折算为时辰（1时辰=2小时）
+    
+    // 岁 = 总时辰 / 36（3天×12时辰=36时辰）
+    let years = Math.floor(totalShichen / 36);
+    const remainingShichen = totalShichen % 36; // 剩余不足1岁的时辰
+    
+    // 月 = 剩余时辰 / 12 * 4个月（1天=12时辰=4个月）
+    let months = Math.floor(remainingShichen / 12 * 4);
+    const remainingShichen2 = remainingShichen % 12; // 剩余不足1天的时辰
+    
+    // 日 = 剩余时辰 * 10天 / 12（1时辰=10天）
+    let days = Math.floor(remainingShichen2 * 10 / 12);
 
+    // 月超过12个月要进位到年
     if (months >= 12) {
       years += Math.floor(months / 12);
       months = months % 12;
@@ -106,8 +125,10 @@ class DayunXiaoyunCalculator {
       years: Math.max(years, 1),
       months: months,
       days: days,
-      total_days: totalDays,
-      target_jieqi: targetJieqi.name + ':' + targetJieqi.date.toISOString().split('T')[0]
+      total_days: Math.floor(totalHours / 24),
+      total_hours: Math.floor(totalHours),
+      target_jieqi: targetJieqi.name,
+      jiaoyun_date: targetJieqi.date.toISOString().split('T')[0]
     };
   }
 
@@ -118,34 +139,30 @@ class DayunXiaoyunCalculator {
 
     const monthGan = monthGanzhi[0];
     const monthZhi = monthGanzhi[1];
-
     const ganIndex = GAN_LIST.indexOf(monthGan);
     const zhiIndex = ZHI_LIST.indexOf(monthZhi);
 
-    const dayunCount = 20;
-    const dayunList = [];
-    let currentAge = startAge + 1;
-
-    const birthYear = birthSolar.year;
-    const birthMonth = birthSolar.month;
-    const birthDay = birthSolar.day;
-
-    let jieqiYear = birthYear + startAge;
-    let jieqiMonth = birthMonth;
-    let jieqiDay = birthDay;
-
-    const targetJieqiStr = startAgeInfo.target_jieqi;
-    if (targetJieqiStr) {
-      const parts = targetJieqiStr.split(':');
-      if (parts.length === 2) {
-        const dateParts = parts[1].split('-');
-        if (dateParts.length === 3) {
-          jieqiYear = parseInt(dateParts[0], 10);
-          jieqiMonth = parseInt(dateParts[1], 10);
-          jieqiDay = parseInt(dateParts[2], 10);
-        }
-      }
+    // 计算第一个交运日期
+    const birthDate = new Date(
+      birthSolar.year,
+      birthSolar.month - 1,
+      birthSolar.day,
+      birthSolar.hour || 12,
+      birthSolar.minute || 0
+    );
+    
+    let firstJiaoyunDate;
+    if (startAgeInfo.jiaoyun_date) {
+      firstJiaoyunDate = new Date(startAgeInfo.jiaoyun_date.replace(/-/g, '/'));
+    } else {
+      // 如果没有精确交运日期，按总天数估算
+      firstJiaoyunDate = new Date(birthDate.getTime() + (startAgeInfo.total_days || 3) * 24 * 60 * 60 * 1000);
     }
+
+    const dayunCount = 12;
+    const dayunList = [];
+    let currentAge = startAge;
+    let currentJiaoyunDate = new Date(firstJiaoyunDate);
 
     for (let i = 0; i < dayunCount; i++) {
       let nextGanIndex, nextZhiIndex;
@@ -164,8 +181,6 @@ class DayunXiaoyunCalculator {
       const changsheng = this.nayinCalc.getChangshengInfo(ganzhi, ZHI_LIST[nextZhiIndex]);
       const tenGod = this.lunarCalc._getTenGod(yearGan, dayunGan);
 
-      const startYear = jieqiYear + i * 10;
-
       dayunList.push({
         index: i + 1,
         ganzhi: ganzhi,
@@ -176,11 +191,12 @@ class DayunXiaoyunCalculator {
         ten_god: tenGod,
         start_age: currentAge,
         end_age: currentAge + 9,
-        start_year: startYear,
-        start_date: `${startYear}.${jieqiMonth}.${jieqiDay}`
+        start_year: currentJiaoyunDate.getFullYear(),
+        start_date: currentJiaoyunDate.toISOString().split('T')[0]
       });
 
       currentAge += 10;
+      currentJiaoyunDate = new Date(currentJiaoyunDate.getTime() + 10 * 365 * 24 * 60 * 60 * 1000);
     }
 
     return dayunList;
@@ -336,5 +352,77 @@ function printDayun(result) {
   return lines.join('\n');
 }
 
-export { DayunXiaoyunCalculator, calculateDayunXiaoyun, printDayun };
+function getCurrentLiuNian() {
+  const calc = new DayunXiaoyunCalculator();
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  
+  try {
+    calc.lunarCalc.solarToLunar(year, month, day, 12, 0);
+    const yearGanzhi = calc.lunarCalc.getYearInGanZhi();
+    const yearNayin = calc.lunarCalc.getYearNaYin();
+    const yearChangsheng = calc.lunarCalc._getChangShengInfo(yearGanzhi, yearGanzhi[1]);
+    
+    return {
+      流年: {
+        year: year,
+        ganzhi: yearGanzhi,
+        nayin: yearNayin,
+        wuxing: LunarCalendar.NAYIN_WUXING[yearNayin] || '',
+        position: yearChangsheng.position,
+        ji_xiong: yearChangsheng.jiXiong,
+      },
+      当前时间: `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`,
+      农历: String(calc.lunarCalc.lunarInstance)
+    };
+  } catch (e) {
+    return {
+      流年: { year: year, ganzhi: '未知', nayin: '未知', wuxing: '未知', position: '未知', ji_xiong: '未知' },
+      当前时间: `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`,
+      农历: '未知'
+    };
+  }
+}
+
+function getYearsLiuNian(startYear, count = 10) {
+  const calc = new DayunXiaoyunCalculator();
+  const yearsData = [];
+
+  for (let i = 0; i < count; i++) {
+    const year = startYear + i;
+    try {
+      calc.lunarCalc.solarToLunar(year, 1, 1, 12, 0);
+      const yearGanzhi = calc.lunarCalc.getYearInGanZhi();
+      const yearNayin = calc.lunarCalc.getYearNaYin();
+      const yearWuxing = LunarCalendar.NAYIN_WUXING[yearNayin] || '';
+      const yearChangsheng = yearGanzhi
+        ? calc.lunarCalc._getChangShengInfo(yearGanzhi, yearGanzhi[1])
+        : {};
+
+      yearsData.push({
+        year: year,
+        ganzhi: yearGanzhi,
+        nayin: yearNayin,
+        wuxing: yearWuxing,
+        position: yearChangsheng.position || '未知',
+        ji_xiong: yearChangsheng.jiXiong || '未知',
+      });
+    } catch (e) {
+      yearsData.push({
+        year: year,
+        ganzhi: '未知',
+        nayin: '未知',
+        wuxing: '未知',
+        position: '未知',
+        ji_xiong: '未知',
+      });
+    }
+  }
+
+  return yearsData;
+}
+
+export { DayunXiaoyunCalculator, calculateDayunXiaoyun, printDayun, getCurrentLiuNian, getYearsLiuNian };
 export default DayunXiaoyunCalculator;
