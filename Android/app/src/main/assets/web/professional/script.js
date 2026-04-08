@@ -394,6 +394,14 @@ async function displayRecordData(record) {
             xiaoyunShensha: []
         };
         
+        console.log('=== 专业版神煞调试信息 ===');
+        console.log('dayunGanZhi:', currentDayunGanZhi);
+        console.log('liunianGanZhi:', currentLiunianGanZhi);
+        console.log('shenshaResult:', shenshaResult);
+        console.log('dayun_shensha:', shenshaResult.dayun_shensha);
+        console.log('liunian_shensha:', shenshaResult.liunian_shensha);
+        console.log('shensha_by_column:', shenshaResult.shensha_by_column);
+        
         // 7. 显示大运小运
         displayDayunXiaoyun(dayunResult, currentAge, liuyunData);
         
@@ -1012,49 +1020,65 @@ async function showLiuyunInXiaoyunArea(dayunIndex) {
     
     const liunianRow = xiaoyunTable.querySelector('.xiaoyun-liunian-row');
     const xiaoyunRowEl = xiaoyunTable.querySelector('.xiaoyun-xiaoyun-row');
+    const nayinRow = xiaoyunTable.querySelector('.xiaoyun-nayin-row');
     const ageRow = xiaoyunTable.querySelector('.xiaoyun-age-row');
-    
+
     // 清空现有列（保留第一列标签）
-    while (liunianRow.children.length > 1) liunianRow.removeChild(liunianRow.lastChild);
-    while (xiaoyunRowEl.children.length > 1) xiaoyunRowEl.removeChild(xiaoyunRowEl.lastChild);
-    while (ageRow.children.length > 1) ageRow.removeChild(ageRow.lastChild);
-    
-    // 隐藏小运行行（因为小运已合并到流年单元格中）
-    xiaoyunRowEl.style.display = 'none';
-    
+    if (liunianRow) while (liunianRow.children.length > 1) liunianRow.removeChild(liunianRow.lastChild);
+    if (xiaoyunRowEl) while (xiaoyunRowEl.children.length > 1) xiaoyunRowEl.removeChild(xiaoyunRowEl.lastChild);
+    if (nayinRow) while (nayinRow.children.length > 1) nayinRow.removeChild(nayinRow.lastChild);
+    if (ageRow) while (ageRow.children.length > 1) ageRow.removeChild(ageRow.lastChild);
+
+    // 隐藏小运和纳音行（因为小运已合并到流年单元格中）
+    if (xiaoyunRowEl) xiaoyunRowEl.style.display = 'none';
+    if (nayinRow) nayinRow.style.display = 'none';
+
     for (let i = 0; i < 10; i++) {
         const year = startYear + i;
         const liunian = liunianData[i] || {};
         const xiaoyun = xiaoyunData[i] || {};
-        
+
         // 流年单元格（包含小运在下方）
-        const liunianTd = document.createElement('td');
-        liunianTd.className = 'liuyun-cell clickable';
-        liunianTd.innerHTML = `
-            <div class="liuyun-item liuyun-liu">${liunian.ganzhi || ''}</div>
-            <div class="liuyun-item liuyun-xiao">${xiaoyun.ganzhi || ''}</div>
-        `;
-        liunianTd.style.cursor = 'pointer';
-        liunianTd.addEventListener('click', () => {
-            if (dayunLiunianMode) {
-                currentLiunianIndex = i;
-                currentXiaoyunIndex = i;
-                highlightLiunianColumn(i);
-                updateTopThreeColumns(dayunIndex, i, i);
-            }
-        });
-        liunianRow.appendChild(liunianTd);
-        
+        if (liunianRow) {
+            const liunianTd = document.createElement('td');
+            liunianTd.className = 'liuyun-cell clickable';
+            liunianTd.innerHTML = `
+                <div class="liuyun-item liuyun-liu">${liunian.ganzhi || ''}</div>
+                <div class="liuyun-item liuyun-xiao">${xiaoyun.ganzhi || ''}</div>
+            `;
+            liunianTd.style.cursor = 'pointer';
+            liunianTd.addEventListener('click', () => {
+                if (dayunLiunianMode) {
+                    currentLiunianIndex = i;
+                    currentXiaoyunIndex = i;
+                    highlightLiunianColumn(i);
+                    updateTopThreeColumns(dayunIndex, i, i);
+                }
+            });
+            liunianRow.appendChild(liunianTd);
+        }
+
         // 小运单元格（占位，保持结构一致但隐藏）
-        const xiaoyunTd = document.createElement('td');
-        xiaoyunTd.style.display = 'none';
-        xiaoyunRowEl.appendChild(xiaoyunTd);
-        
+        if (xiaoyunRowEl) {
+            const xiaoyunTd = document.createElement('td');
+            xiaoyunTd.style.display = 'none';
+            xiaoyunRowEl.appendChild(xiaoyunTd);
+        }
+
+        // 纳音单元格（占位，保持结构一致但隐藏）
+        if (nayinRow) {
+            const nayinTd = document.createElement('td');
+            nayinTd.style.display = 'none';
+            nayinRow.appendChild(nayinTd);
+        }
+
         // 虚岁
-        const ageTd = document.createElement('td');
-        ageTd.textContent = `${dayun.start_age + i}岁`;
-        ageTd.className = 'age-cell';
-        ageRow.appendChild(ageTd);
+        if (ageRow) {
+            const ageTd = document.createElement('td');
+            ageTd.textContent = `${dayun.start_age + i}岁`;
+            ageTd.className = 'age-cell';
+            ageRow.appendChild(ageTd);
+        }
     }
 }
 

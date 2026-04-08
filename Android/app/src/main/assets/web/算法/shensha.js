@@ -1174,10 +1174,11 @@ class ShenShaCalculator {
             "shengong": shengong_zhi,
         };
 
+        const day_gan = day_ganzhi ? day_ganzhi[0] : "";
         const gans = [
             year_gan,
             month_ganzhi ? month_ganzhi[0] : "",
-            day_ganzhi ? day_ganzhi[0] : "",
+            day_gan,
             hour_ganzhi ? hour_ganzhi[0] : "",
         ];
 

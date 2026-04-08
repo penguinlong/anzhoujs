@@ -1019,6 +1019,14 @@ async function displayDayunLiunian(baziResult) {
             xiaoyunShensha: [] // 小运神煞暂用年柱神煞
         };
         
+        console.log('=== 神煞调试信息 ===');
+        console.log('dayunGanZhi:', currentDayunGanZhi);
+        console.log('liunianGanZhi:', currentLiunianGanZhi);
+        console.log('shenshaResult:', shenshaResult);
+        console.log('dayun_shensha:', shenshaResult.dayun_shensha);
+        console.log('liunian_shensha:', shenshaResult.liunian_shensha);
+        console.log('shensha_by_column:', shenshaResult.shensha_by_column);
+        
         // 显示大运小运流年
         displayDayunResult(dayunResult, currentAge);
         displayLiunianResult(liunianResult);
@@ -1163,50 +1171,6 @@ function displayDayunResult(dayunResult, currentAge) {
         });
     }
     
-    // 生成小运横向表格
-    const xiaoyunTable = document.getElementById('xiaoyun-table');
-    if (xiaoyunTable && dayunResult.xiaoyun && dayunResult.xiaoyun.length > 0) {
-        const headerRow = xiaoyunTable.querySelector('.xiaoyun-header-row');
-        const ganzhiRow = xiaoyunTable.querySelector('.xiaoyun-ganzhi-row');
-        const nayinRow = xiaoyunTable.querySelector('.xiaoyun-nayin-row');
-        const ageRow = xiaoyunTable.querySelector('.xiaoyun-age-row');
-        
-        // 清空现有列（保留第一列标签）
-        while (headerRow.children.length > 1) headerRow.removeChild(headerRow.lastChild);
-        while (ganzhiRow.children.length > 1) ganzhiRow.removeChild(ganzhiRow.lastChild);
-        while (nayinRow.children.length > 1) nayinRow.removeChild(nayinRow.lastChild);
-        while (ageRow.children.length > 1) ageRow.removeChild(ageRow.lastChild);
-        
-        // 添加小运数据列 (每10年显示一列)
-        for (let i = 0; i < Math.min(120, dayunResult.xiaoyun.length); i += 10) {
-            const xiaoyun = dayunResult.xiaoyun[i];
-            
-            // 十神
-            const tenGodTh = document.createElement('th');
-            tenGodTh.textContent = xiaoyun.ten_god || '';
-            tenGodTh.className = 'ten-god-cell';
-            headerRow.appendChild(tenGodTh);
-            
-            // 干支
-            const ganzhiTd = document.createElement('td');
-            ganzhiTd.textContent = xiaoyun.ganzhi;
-            ganzhiTd.className = 'ganzhi-cell';
-            ganzhiRow.appendChild(ganzhiTd);
-            
-            // 纳音
-            const nayinTd = document.createElement('td');
-            nayinTd.textContent = xiaoyun.nayin || '';
-            nayinTd.className = 'nayin-cell';
-            nayinRow.appendChild(nayinTd);
-            
-            // 虚岁
-            const ageTd = document.createElement('td');
-            ageTd.textContent = `${xiaoyun.age}岁`;
-            ageTd.className = 'age-cell';
-            ageRow.appendChild(ageTd);
-        }
-    }
-    
     // 存储当前年龄并自动显示当前大运的流年小运
     window._currentAge = currentAge;
     showLiuyunInXiaoyunArea(-1);
@@ -1238,7 +1202,7 @@ function displayLiunianResult(liunianResult) {
                         <span>流日：${liunianResult['流日']['ganzhi']}（${liunianResult['流日']['nayin']}）</span>
                     </div>
                     <div class="liunian-shensha">
-                        <span>流年神煞：${liunianResult['流年神煞'] || '无'}</span>
+                        <span>流年神煞：${(window._currentLiuyunData?.liunianShensha || []).join('、') || '无'}</span>
                     </div>
                 </div>
             </div>
@@ -1301,18 +1265,18 @@ function findCurrentDayunIndex(currentAge) {
 async function showLiuyunInXiaoyunArea(dayunIndex) {
     const xiaoyunTable = document.getElementById('xiaoyun-table');
     if (!xiaoyunTable || !currentDayunResult || !currentDayunResult.dayun) return;
-    
+
     // 如果dayunIndex为-1，自动根据年龄查找当前大运
     if (dayunIndex === -1) {
         dayunIndex = findCurrentDayunIndex(window._currentAge || currentAge);
     }
-    
+
     const dayun = currentDayunResult.dayun[dayunIndex];
     if (!dayun) return;
-    
+
     // 更新选中状态
     selectedDayunIndex = dayunIndex;
-    
+
     // 更新大运列的高亮
     const dayunTable = document.getElementById('dayun-table');
     if (dayunTable) {
@@ -1324,68 +1288,75 @@ async function showLiuyunInXiaoyunArea(dayunIndex) {
             }
         });
     }
-    
+
     // 计算起始年份：出生年 + 开始年龄
     const startYear = currentBirthYear + dayun.start_age;
-    
+
     // 获取10年流年数据
     const liunianData = await getYearsLiunian(startYear, 10);
-    
+
     // 获取对应的10年小运数据
     const xiaoyunStartIndex = dayun.start_age - 1; // 小运从1岁开始，index = age - 1
     const xiaoyunData = currentDayunResult.xiaoyun.slice(xiaoyunStartIndex, xiaoyunStartIndex + 10);
-    
+
     // 更新小运表格的标题
-    const subtitleEl = document.querySelector('.xiaoyun-table-container .dayun-subtitle, .xiaoyun-table-container .xiaoyun-subtitle');
+    const subtitleEl = document.querySelector('.xiaoyun-table-container .xiaoyun-subtitle');
     if (subtitleEl) {
         subtitleEl.textContent = `小运流年 - ${dayun.ganzhi}`;
     }
-    
+
     // 获取小运表格的各行
-    const headerRow = xiaoyunTable.querySelector('.xiaoyun-header-row');
-    const ganzhiRow = xiaoyunTable.querySelector('.xiaoyun-ganzhi-row');
+    const liunianRow = xiaoyunTable.querySelector('.xiaoyun-liunian-row');
+    const xiaoyunRow = xiaoyunTable.querySelector('.xiaoyun-xiaoyun-row');
     const nayinRow = xiaoyunTable.querySelector('.xiaoyun-nayin-row');
     const ageRow = xiaoyunTable.querySelector('.xiaoyun-age-row');
-    
+
     // 清空现有列（保留第一列标签）
-    while (headerRow.children.length > 1) headerRow.removeChild(headerRow.lastChild);
-    while (ganzhiRow.children.length > 1) ganzhiRow.removeChild(ganzhiRow.lastChild);
-    while (nayinRow.children.length > 1) nayinRow.removeChild(nayinRow.lastChild);
-    while (ageRow.children.length > 1) ageRow.removeChild(ageRow.lastChild);
-    
+    if (liunianRow) while (liunianRow.children.length > 1) liunianRow.removeChild(liunianRow.lastChild);
+    if (xiaoyunRow) while (xiaoyunRow.children.length > 1) xiaoyunRow.removeChild(xiaoyunRow.lastChild);
+    if (nayinRow) while (nayinRow.children.length > 1) nayinRow.removeChild(nayinRow.lastChild);
+    if (ageRow) while (ageRow.children.length > 1) ageRow.removeChild(ageRow.lastChild);
+
     // 添加10列流年小运数据
     for (let i = 0; i < 10; i++) {
         const year = startYear + i;
         const liunian = liunianData[i] || {};
         const xiaoyun = xiaoyunData[i] || {};
-        
-        // 年份（十神行）
-        const tenGodTh = document.createElement('th');
-        tenGodTh.textContent = year;
-        tenGodTh.className = 'liuyun-year-cell';
-        tenGodTh.style.color = '#2196F3';
-        headerRow.appendChild(tenGodTh);
-        
-        // 流年（干支行）
-        const liunianTd = document.createElement('td');
-        liunianTd.textContent = liunian.ganzhi || '';
-        liunianTd.className = 'liuyun-liunian-cell';
-        liunianTd.style.color = 'var(--primary-color)';
-        liunianTd.style.fontWeight = 'bold';
-        ganzhiRow.appendChild(liunianTd);
-        
-        // 小运（纳音行）
-        const xiaoyunTd = document.createElement('td');
-        xiaoyunTd.textContent = xiaoyun.ganzhi || '';
-        xiaoyunTd.className = 'liuyun-xiaoyun-cell';
-        xiaoyunTd.style.color = '#4CAF50';
-        xiaoyunTd.style.fontWeight = 'bold';
-        nayinRow.appendChild(xiaoyunTd);
-        
+
+        // 流年（流年行）
+        if (liunianRow) {
+            const liunianTd = document.createElement('td');
+            liunianTd.textContent = liunian.ganzhi || '';
+            liunianTd.className = 'liuyun-liunian-cell';
+            liunianTd.style.color = 'var(--primary-color)';
+            liunianTd.style.fontWeight = 'bold';
+            liunianRow.appendChild(liunianTd);
+        }
+
+        // 小运（小运行）
+        if (xiaoyunRow) {
+            const xiaoyunTd = document.createElement('td');
+            xiaoyunTd.textContent = xiaoyun.ganzhi || '';
+            xiaoyunTd.className = 'liuyun-xiaoyun-cell';
+            xiaoyunTd.style.color = '#4CAF50';
+            xiaoyunTd.style.fontWeight = 'bold';
+            xiaoyunRow.appendChild(xiaoyunTd);
+        }
+
+        // 纳音
+        if (nayinRow) {
+            const nayinTd = document.createElement('td');
+            nayinTd.textContent = liunian.nayin || '';
+            nayinTd.className = 'nayin-cell';
+            nayinRow.appendChild(nayinTd);
+        }
+
         // 虚岁
-        const ageTd = document.createElement('td');
-        ageTd.textContent = `${dayun.start_age + i}岁`;
-        ageTd.className = 'age-cell';
-        ageRow.appendChild(ageTd);
+        if (ageRow) {
+            const ageTd = document.createElement('td');
+            ageTd.textContent = `${dayun.start_age + i}岁`;
+            ageTd.className = 'age-cell';
+            ageRow.appendChild(ageTd);
+        }
     }
 }
