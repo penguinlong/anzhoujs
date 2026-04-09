@@ -78,6 +78,14 @@ class BaziCalculator {
   }
 
   calculateFromGanzhi(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi) {
+    // 获取生肖（根据年支）
+    const yearZhi = yearGanzhi[1];
+    const ZHI_ZODIAC = {
+      '子': '鼠', '丑': '牛', '寅': '虎', '卯': '兔',
+      '辰': '龙', '巳': '蛇', '午': '马', '未': '羊',
+      '申': '猴', '酉': '鸡', '戌': '狗', '亥': '猪'
+    };
+
     return {
       'year': yearGanzhi,
       'month': monthGanzhi,
@@ -96,27 +104,27 @@ class BaziCalculator {
       'true_solar_time': '未知',
       'lunar_date': '未知',
       'solar_date': '未知',
-      'zodiac': '未知',
+      'zodiac': ZHI_ZODIAC[yearZhi] || '未知',
       'ten_gods': {
         'year_gan': '年主',
-        'month_gan': this.lunarCalc._getTenGod(yearGanzhi[0], monthGanzhi[0]),
-        'day_gan': this.lunarCalc._getTenGod(yearGanzhi[0], dayGanzhi[0]),
-        'hour_gan': this.lunarCalc._getTenGod(yearGanzhi[0], hourGanzhi[0]),
-        'year_zhi': '年主',
-        'month_zhi': this.lunarCalc._getTenGod(yearGanzhi[0], monthGanzhi[1]),
-        'day_zhi': this.lunarCalc._getTenGod(yearGanzhi[0], dayGanzhi[1]),
-        'hour_zhi': this.lunarCalc._getTenGod(yearGanzhi[0], hourGanzhi[1])
+        'month_gan': this.lunarCalc._getTenGod(dayGanzhi[0], monthGanzhi[0]),
+        'day_gan': '日主',
+        'hour_gan': this.lunarCalc._getTenGod(dayGanzhi[0], hourGanzhi[0]),
+        'year_zhi': '年支',
+        'month_zhi': this.lunarCalc._getTenGod(dayGanzhi[0], monthGanzhi[1]),
+        'day_zhi': '日支',
+        'hour_zhi': this.lunarCalc._getTenGod(dayGanzhi[0], hourGanzhi[1])
       },
       'nayin_changsheng': {
-        'year': this.nayinCalc.getChangshengInfo(yearGanzhi, yearGanzhi[1]),
-        'month': this.nayinCalc.getChangshengInfo(monthGanzhi, monthGanzhi[1]),
+        'year': this.nayinCalc.getChangshengInfo(dayGanzhi, yearGanzhi[1]),
+        'month': this.nayinCalc.getChangshengInfo(dayGanzhi, monthGanzhi[1]),
         'day': this.nayinCalc.getChangshengInfo(dayGanzhi, dayGanzhi[1]),
-        'hour': this.nayinCalc.getChangshengInfo(hourGanzhi, hourGanzhi[1])
+        'hour': this.nayinCalc.getChangshengInfo(dayGanzhi, hourGanzhi[1])
       },
       'nian_gan_changsheng': {
-        'month_zhi': this.nayinCalc.getChangshengByGan(yearGanzhi[0], monthGanzhi[1]),
-        'day_zhi': this.nayinCalc.getChangshengByGan(yearGanzhi[0], dayGanzhi[1]),
-        'hour_zhi': this.nayinCalc.getChangshengByGan(yearGanzhi[0], hourGanzhi[1])
+        'month_zhi': this.nayinCalc.getChangshengByNayin(yearGanzhi[0], monthGanzhi[1]),
+        'day_zhi': this.nayinCalc.getChangshengByNayin(yearGanzhi[0], dayGanzhi[1]),
+        'hour_zhi': this.nayinCalc.getChangshengByNayin(yearGanzhi[0], hourGanzhi[1])
       }
     };
   }
@@ -316,11 +324,30 @@ function calculateBazi(year, month, day, hour = 12, minute = 0, options = {}) {
   const calc = new BaziCalculator();
 
   if (isGanzhi) {
-    const parts = ganzhiInput.replace(/\s/g, '').split('/');
-    if (parts.length !== 4) {
-      throw new Error('干支输入格式错误，应为：年柱/月柱/日柱/时柱');
+    // 支持两种格式：对象格式 { year, month, day, hour } 或字符串格式 "年柱/月柱/日柱/时柱"
+    let yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi;
+
+    if (typeof ganzhiInput === 'object' && ganzhiInput !== null) {
+      yearGanzhi = ganzhiInput.year;
+      monthGanzhi = ganzhiInput.month;
+      dayGanzhi = ganzhiInput.day;
+      hourGanzhi = ganzhiInput.hour;
+    } else {
+      const parts = String(ganzhiInput).replace(/\s/g, '').split('/');
+      if (parts.length !== 4) {
+        throw new Error('干支输入格式错误，应为：年柱/月柱/日柱/时柱');
+      }
+      yearGanzhi = parts[0];
+      monthGanzhi = parts[1];
+      dayGanzhi = parts[2];
+      hourGanzhi = parts[3];
     }
-    return calc.calculateFromGanzhi(parts[0], parts[1], parts[2], parts[3]);
+
+    if (!yearGanzhi || !monthGanzhi || !dayGanzhi || !hourGanzhi) {
+      throw new Error('干支输入不完整');
+    }
+
+    return calc.calculateFromGanzhi(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi);
   }
 
   if (isLunar) {

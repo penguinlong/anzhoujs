@@ -31,15 +31,14 @@
                 </div>
 
                 <div class="form-group" id="date-input-group">
-                    <div class="date-selects">
+                    <div class="date-selects" id="solar-lunar-inputs">
                         <select id="year-select" class="select-field"></select>
                         <select id="month-select" class="select-field"></select>
                         <select id="day-select" class="select-field"></select>
                     </div>
-                    
                 </div>
 
-                <div class="form-group row">
+                <div class="form-group row" id="time-input-row">
                     <select id="hour" class="select-field time-select">
                         <option value="">请选择时辰</option>
                         <option value="0">00 (子时)</option>
@@ -74,6 +73,12 @@
                         <option value="45">45 分</option>
                     </select>
                 </div>
+
+                <!-- 干支快捷入口按钮 -->
+                <button type="button" class="btn-ganzhi-entry" id="btn-open-ganzhi">
+                    <span class="btn-ganzhi-icon">☰</span>
+                    <span>干支输入</span>
+                </button>
 
                 <div class="form-group row between">
                     <span class="label-text">时区选择</span>
@@ -148,7 +153,7 @@
                         <div class="table-cell header-cell">命宫</div>
                         <div class="table-cell header-cell">身宫</div>
                     </div>
-                    
+
                     <div class="table-row ten-gods-row" id="ten-gods-row">
                         <div class="table-cell" id="ten-god-year"></div>
                         <div class="table-cell" id="ten-god-month"></div>
@@ -158,7 +163,7 @@
                         <div class="table-cell" id="ten-god-minggong"></div>
                         <div class="table-cell" id="ten-god-shengong"></div>
                     </div>
-                    
+
                     <div class="table-row heavenly-stem-row" id="heavenly-stem-row">
                         <div class="table-cell stem-cell" id="stem-year"></div>
                         <div class="table-cell stem-cell" id="stem-month"></div>
@@ -168,7 +173,7 @@
                         <div class="table-cell stem-cell" id="stem-minggong"></div>
                         <div class="table-cell stem-cell" id="stem-shengong"></div>
                     </div>
-                    
+
                     <div class="table-row earthly-branch-row" id="earthly-branch-row">
                         <div class="table-cell branch-cell" id="branch-year"></div>
                         <div class="table-cell branch-cell" id="branch-month"></div>
@@ -178,7 +183,7 @@
                         <div class="table-cell branch-cell" id="branch-minggong"></div>
                         <div class="table-cell branch-cell" id="branch-shengong"></div>
                     </div>
-                    
+
                     <div class="table-row nayin-row" id="nayin-row">
                         <div class="table-cell nayin-cell" id="nayin-year"></div>
                         <div class="table-cell nayin-cell" id="nayin-month"></div>
@@ -188,7 +193,7 @@
                         <div class="table-cell nayin-cell" id="nayin-minggong"></div>
                         <div class="table-cell nayin-cell" id="nayin-shengong"></div>
                     </div>
-                    
+
                     <div class="table-row shen-sha-row" id="shen-sha-row">
                         <div class="table-cell shen-sha-cell" id="shen-sha-year"></div>
                         <div class="table-cell shen-sha-cell" id="shen-sha-month"></div>
@@ -243,7 +248,7 @@
                 <!-- 大运小运流年区域 -->
                 <div class="dayun-section" id="dayun-section">
                     <div class="section-title">大运小运流年</div>
-                    
+
                     <!-- 当前流运标题区 -->
                     <div class="current-liuyun-section">
                         <div class="liuyun-item dayun-item">
@@ -259,7 +264,7 @@
                             <div class="liuyun-shensha" id="current-liunian-shensha"></div>
                         </div>
                     </div>
-                    
+
                     <!-- 大运横向表格 -->
                     <div class="dayun-table-container">
                         <div class="dayun-subtitle">大运（<span id="dayun-direction">顺行</span>）</div>
@@ -287,7 +292,7 @@
                             </table>
                         </div>
                     </div>
-                    
+
                     <!-- 小运横向表格 -->
                     <div class="xiaoyun-table-container">
                         <div class="dayun-subtitle">小运</div>
@@ -357,6 +362,190 @@
                 <span class="nav-text">设置</span>
             </div>
         </nav>
+    </div>
+
+    <!-- 干支四柱选择弹窗 -->
+    <div class="ganzhi-modal-overlay" id="ganzhi-modal-overlay">
+        <div class="ganzhi-modal">
+            <!-- 顶部标签 -->
+            <div class="modal-tabs">
+                <button type="button" class="modal-tab" data-tab="solar">公历</button>
+                <button type="button" class="modal-tab" data-tab="lunar">农历</button>
+                <button type="button" class="modal-tab active" data-tab="ganzhi">干支（四柱）</button>
+            </div>
+
+            <!-- 公历内容 -->
+            <div class="modal-content" id="modal-content-solar" style="display: none;">
+                <div class="modal-date-inputs">
+                    <select id="modal-year-select" class="select-field"></select>
+                    <select id="modal-month-select" class="select-field"></select>
+                    <select id="modal-day-select" class="select-field"></select>
+                </div>
+                <div class="modal-time-inputs">
+                    <select id="modal-hour-select" class="select-field">
+                        <option value="">请选择时辰</option>
+                        <option value="0">00 (子时)</option>
+                        <option value="1">01 (丑时)</option>
+                        <option value="2">02 (丑时)</option>
+                        <option value="3">03 (寅时)</option>
+                        <option value="4">04 (寅时)</option>
+                        <option value="5">05 (卯时)</option>
+                        <option value="6">06 (卯时)</option>
+                        <option value="7">07 (辰时)</option>
+                        <option value="8">08 (辰时)</option>
+                        <option value="9">09 (巳时)</option>
+                        <option value="10">10 (巳时)</option>
+                        <option value="11">11 (午时)</option>
+                        <option value="12">12 (午时)</option>
+                        <option value="13">13 (未时)</option>
+                        <option value="14">14 (未时)</option>
+                        <option value="15">15 (申时)</option>
+                        <option value="16">16 (申时)</option>
+                        <option value="17">17 (酉时)</option>
+                        <option value="18">18 (酉时)</option>
+                        <option value="19">19 (戌时)</option>
+                        <option value="20">20 (戌时)</option>
+                        <option value="21">21 (亥时)</option>
+                        <option value="22">22 (亥时)</option>
+                        <option value="23">23 (子时)</option>
+                    </select>
+                    <select id="modal-minute-select" class="select-field">
+                        <option value="0">00 分</option>
+                        <option value="15">15 分</option>
+                        <option value="30">30 分</option>
+                        <option value="45">45 分</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 农历内容 -->
+            <div class="modal-content" id="modal-content-lunar" style="display: none;">
+                <div class="modal-date-inputs">
+                    <select id="modal-lunar-year-select" class="select-field"></select>
+                    <select id="modal-lunar-month-select" class="select-field"></select>
+                    <select id="modal-lunar-day-select" class="select-field"></select>
+                </div>
+                <div class="modal-time-inputs">
+                    <select id="modal-lunar-hour-select" class="select-field">
+                        <option value="">请选择时辰</option>
+                        <option value="0">00 (子时)</option>
+                        <option value="1">01 (丑时)</option>
+                        <option value="2">02 (丑时)</option>
+                        <option value="3">03 (寅时)</option>
+                        <option value="4">04 (寅时)</option>
+                        <option value="5">05 (卯时)</option>
+                        <option value="6">06 (卯时)</option>
+                        <option value="7">07 (辰时)</option>
+                        <option value="8">08 (辰时)</option>
+                        <option value="9">09 (巳时)</option>
+                        <option value="10">10 (巳时)</option>
+                        <option value="11">11 (午时)</option>
+                        <option value="12">12 (午时)</option>
+                        <option value="13">13 (未时)</option>
+                        <option value="14">14 (未时)</option>
+                        <option value="15">15 (申时)</option>
+                        <option value="16">16 (申时)</option>
+                        <option value="17">17 (酉时)</option>
+                        <option value="18">18 (酉时)</option>
+                        <option value="19">19 (戌时)</option>
+                        <option value="20">20 (戌时)</option>
+                        <option value="21">21 (亥时)</option>
+                        <option value="22">22 (亥时)</option>
+                        <option value="23">23 (子时)</option>
+                    </select>
+                    <select id="modal-lunar-minute-select" class="select-field">
+                        <option value="0">00 分</option>
+                        <option value="15">15 分</option>
+                        <option value="30">30 分</option>
+                        <option value="45">45 分</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 干支四柱内容 -->
+            <div class="modal-content" id="modal-content-ganzhi">
+                <div class="ganzhi-grid">
+                    <div class="ganzhi-col">
+                        <span class="ganzhi-col-label">年柱</span>
+                        <div class="ganzhi-col-buttons">
+                            <button class="ganzhi-btn gan-btn" data-pillar="year" data-type="gan">-</button>
+                            <button class="ganzhi-btn zhi-btn" data-pillar="year" data-type="zhi">-</button>
+                        </div>
+                    </div>
+                    <div class="ganzhi-col">
+                        <span class="ganzhi-col-label">月柱</span>
+                        <div class="ganzhi-col-buttons">
+                            <button class="ganzhi-btn gan-btn" data-pillar="month" data-type="gan">-</button>
+                            <button class="ganzhi-btn zhi-btn" data-pillar="month" data-type="zhi">-</button>
+                        </div>
+                    </div>
+                    <div class="ganzhi-col">
+                        <span class="ganzhi-col-label">日柱</span>
+                        <div class="ganzhi-col-buttons">
+                            <button class="ganzhi-btn gan-btn" data-pillar="day" data-type="gan">-</button>
+                            <button class="ganzhi-btn zhi-btn" data-pillar="day" data-type="zhi">-</button>
+                        </div>
+                    </div>
+                    <div class="ganzhi-col">
+                        <span class="ganzhi-col-label">时柱</span>
+                        <div class="ganzhi-col-buttons">
+                            <button class="ganzhi-btn gan-btn" data-pillar="hour" data-type="gan">-</button>
+                            <button class="ganzhi-btn zhi-btn" data-pillar="hour" data-type="zhi">-</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="ganzhi-tip" id="modal-ganzhi-tip"></div>
+            </div>
+
+            <!-- 底部选项 -->
+            <div class="modal-footer">
+                <div class="modal-footer-info">
+                    <span>查找范围：1801~2099年</span>
+                    <label class="daylight-saving">
+                        <input type="checkbox" id="modal-daylight-saving">
+                        <span>夏令时</span>
+                    </label>
+                </div>
+                <div class="modal-footer-buttons">
+                    <button type="button" class="btn-modal-cancel" id="modal-cancel">取消</button>
+                    <button type="button" class="btn-modal-confirm" id="modal-confirm">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 天干选择浮层 -->
+    <div class="picker-tooltip" id="gan-picker-tooltip">
+        <div class="picker-tooltip-content">
+            <button class="picker-item" data-gan="甲">甲</button>
+            <button class="picker-item" data-gan="乙">乙</button>
+            <button class="picker-item" data-gan="丙">丙</button>
+            <button class="picker-item" data-gan="丁">丁</button>
+            <button class="picker-item" data-gan="戊">戊</button>
+            <button class="picker-item" data-gan="己">己</button>
+            <button class="picker-item" data-gan="庚">庚</button>
+            <button class="picker-item" data-gan="辛">辛</button>
+            <button class="picker-item" data-gan="壬">壬</button>
+            <button class="picker-item" data-gan="癸">癸</button>
+        </div>
+    </div>
+
+    <!-- 地支选择浮层 -->
+    <div class="picker-tooltip" id="zhi-picker-tooltip">
+        <div class="picker-tooltip-content">
+            <button class="picker-item" data-zhi="子">子</button>
+            <button class="picker-item" data-zhi="丑">丑</button>
+            <button class="picker-item" data-zhi="寅">寅</button>
+            <button class="picker-item" data-zhi="卯">卯</button>
+            <button class="picker-item" data-zhi="辰">辰</button>
+            <button class="picker-item" data-zhi="巳">巳</button>
+            <button class="picker-item" data-zhi="午">午</button>
+            <button class="picker-item" data-zhi="未">未</button>
+            <button class="picker-item" data-zhi="申">申</button>
+            <button class="picker-item" data-zhi="酉">酉</button>
+            <button class="picker-item" data-zhi="戌">戌</button>
+            <button class="picker-item" data-zhi="亥">亥</button>
+        </div>
     </div>
 
     <script src="../common/database.js"></script>
