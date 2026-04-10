@@ -1532,3 +1532,173 @@ input:checked + .slider:before {
     border-color: var(--primary-color);
     color: #000;
 }
+
+/* ===== 窄屏适配 ===== */
+@media screen and (max-width: 380px) {
+    /* 干支四柱弹窗窄屏适配 */
+    .ganzhi-modal {
+        max-height: 90vh;
+    }
+
+    .modal-tabs {
+        padding: 0 8px;
+    }
+
+    .modal-tab {
+        padding: 12px 4px;
+        font-size: 12px;
+    }
+
+    .modal-content {
+        padding: 16px 8px;
+    }
+
+    /* 四柱网格窄屏适配 */
+    .ganzhi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .ganzhi-btn {
+        width: 56px;
+        height: 56px;
+        font-size: 18px;
+    }
+
+    /* 干支选择浮层窄屏适配 */
+    .picker-item {
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+    }
+
+    #gan-picker-tooltip .picker-tooltip-content {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+    }
+
+    #zhi-picker-tooltip .picker-tooltip-content {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+    }
+
+    /* 日期时间选择器窄屏适配 */
+    .modal-date-inputs,
+    .modal-time-inputs {
+        flex-wrap: wrap;
+    }
+
+    .modal-date-inputs .select-field,
+    .modal-time-inputs .select-field {
+        flex: 1 1 45%;
+        min-width: 0;
+    }
+
+    /* 年份选择器窄屏适配 */
+    .ganzhi-year-section {
+        padding: 12px 8px;
+    }
+
+    .ganzhi-year-section .section-title {
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .ganzhi-year-select {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    /* 弹窗底部窄屏适配 */
+    .modal-footer {
+        padding: 12px 8px;
+    }
+
+    .modal-footer-buttons {
+        gap: 8px;
+    }
+
+    .btn-modal-cancel,
+    .btn-modal-confirm {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .modal-footer-info {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+}
+
+/* 超窄屏适配（iPhone SE等） */
+@media screen and (max-width: 320px) {
+    .ganzhi-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 16px;
+    }
+
+    .ganzhi-grid {
+        gap: 8px;
+    }
+
+    .picker-item {
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+    }
+}
+
+/* 横屏适配 */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .ganzhi-modal {
+        max-height: 95vh;
+    }
+
+    .ganzhi-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* 年份选择器样式 */
+.ganzhi-year-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-card);
+}
+
+.ganzhi-year-section .section-title {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.ganzhi-year-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-input);
+    font-size: 15px;
+    color: var(--text-primary);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+}
+
+.ganzhi-year-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.ganzhi-year-tip {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-align: center;
+}

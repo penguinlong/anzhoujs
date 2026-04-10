@@ -279,76 +279,119 @@ async function loadRecordFromUrl() {
 async function displayRecordData(record) {
     const data = record.fullData || record;
     const originalSolar = data.original_solar || {};
-    
+
     // 从fullData或record中提取正确的字段（同时检查驼峰和下划线格式）
     const solarDateStr = data.solarDate || data.solar_date || '';
-    const solarYear = originalSolar.year || (solarDateStr ? parseInt(solarDateStr.split('-')[0]) : data.solarYear);
-    const solarMonth = originalSolar.month || (solarDateStr ? parseInt(solarDateStr.split('-')[1]) : data.solarMonth);
-    const solarDay = originalSolar.day || (solarDateStr ? parseInt(solarDateStr.split('-')[2]) : data.solarDay);
+    const solarYear = originalSolar.year || (solarDateStr && solarDateStr.includes('-') ? parseInt(solarDateStr.split('-')[0]) : data.solarYear);
+    const solarMonth = originalSolar.month || (solarDateStr && solarDateStr.includes('-') ? parseInt(solarDateStr.split('-')[1]) : data.solarMonth);
+    const solarDay = originalSolar.day || (solarDateStr && solarDateStr.includes('-') ? parseInt(solarDateStr.split('-')[2]) : data.solarDay);
     const hour = originalSolar.hour !== undefined ? originalSolar.hour : (data.hour !== undefined ? (typeof data.hour === 'number' ? data.hour : 12) : 12);
     const minute = originalSolar.minute || 0;
     const gender = data.gender === '男' ? 'male' : (data.gender === '女' ? 'female' : (data.gender || 'male'));
-    
+
     // dateType 字段在 record 中是驼峰命名，从 record 读取
     const dateType = record.dateType || data.dateType || 'solar';
     const isLeapMonth = record.is_leap_month || data.is_leap_month || false;
-    
-    console.log('displayRecordData:', { data, originalSolar, solarYear, solarMonth, solarDay, hour, minute, dateType, isLeapMonth });
-    
-    // 1. 调用排盘API
-    const calculateData = {
-        name: data.name || '匿名',
-        gender: gender,
-        date_type: dateType === 'lunar' ? 'lunar' : 'solar',
-        solar_year: solarYear,
-        solar_month: solarMonth,
-        solar_day: solarDay,
-        hour: hour,
-        minute: minute,
-        is_leap_month: isLeapMonth,
-        longitude: data.longitude || 120,
-        use_true_solar: data.use_true_solar !== false
-    };
-    
+
+    // 检查是否是干支输入记录
+    const isGanzhiRecord = dateType === 'ganzhi' || data.solar_date === '干支输入';
+    const originalInput = record.originalInput || {};
+
+    console.log('displayRecordData:', { data, originalSolar, solarYear, solarMonth, solarDay, hour, minute, dateType, isLeapMonth, isGanzhiRecord });
+
+    // 检查是否是有效的日期（非干支输入）
+    const hasValidDate = solarYear && solarMonth && solarDay && !isNaN(solarYear) && !isNaN(solarMonth) && !isNaN(solarDay) && !isGanzhiRecord;
+
     try {
-        const baziResult = await callCalculateAPI(calculateData);
+        let baziResult;
+
+        // 如果是干支输入记录，直接使用存储的fullData
+        if (isGanzhiRecord) {
+            baziResult = data;
+            // 如果有原始输入信息（包含选择的出生年份），用于大运计算
+            if (originalInput.solar_year && originalInput.solar_month && originalInput.solar_day) {
+                baziResult.original_solar = {
+                    year: originalInput.solar_year,
+                    month: originalInput.solar_month,
+                    day: originalInput.solar_day,
+                    hour: originalInput.hour || 12,
+                    minute: originalInput.minute || 0
+                };
+            }
+        } else if (hasValidDate) {
+            // 有有效日期，调用API计算
+            const calculateData = {
+                name: data.name || '匿名',
+                gender: gender,
+                date_type: dateType === 'lunar' ? 'lunar' : 'solar',
+                solar_year: solarYear,
+                solar_month: solarMonth,
+                solar_day: solarDay,
+                hour: hour,
+                minute: minute,
+                is_leap_month: isLeapMonth,
+                longitude: data.longitude || 120,
+                use_true_solar: data.use_true_solar !== false
+            };
+            baziResult = await callCalculateAPI(calculateData);
+        } else {
+            // 直接使用存储的fullData
+            baziResult = data;
+        }
+
         currentBaziResult = baziResult;
-        
+
         // 2. 显示基本信息
         displayBasicInfo(baziResult, data.name);
-        
+
         // 3. 显示四柱信息
         displaySizhu(baziResult);
-        
+
         // 4. 显示三垣
         displaySanyuan(baziResult);
-        
-        // 5. 调用大运API
+
+        // 5. 如果没有有效日期且不是干支输入，不计算大运小运流年
+        if (!hasValidDate && !isGanzhiRecord) {
+            displayDayunPlaceholder(true);
+            return;
+        }
+
+        // 如果是干支输入但没有选择出生年份，显示提示
+        if (isGanzhiRecord && !originalInput.solar_year) {
+            displayDayunPlaceholder(true);
+            return;
+        }
+
+        // 6. 调用大运API
+        const dayunYear = isGanzhiRecord ? (originalInput.solar_year || solarYear) : solarYear;
+        const dayunMonth = isGanzhiRecord ? (originalInput.solar_month || 1) : solarMonth;
+        const dayunDay = isGanzhiRecord ? (originalInput.solar_day || 1) : solarDay;
+
         const dayunResult = await callDayunAPI({
             bazi_result: baziResult,
             gender: gender,
-            birth_year: solarYear,
-            birth_month: solarMonth,
-            birth_day: solarDay,
+            birth_year: dayunYear,
+            birth_month: dayunMonth,
+            birth_day: dayunDay,
             birth_hour: hour,
             birth_minute: minute
         });
-        
+
         // 存储全局大运结果供弹窗使用
         currentDayunResult = dayunResult;
-        currentBirthYear = solarYear;
-        
+        currentBirthYear = dayunYear;
+
         // 获取当前流年
         const liunianResult = await callLiunianAPI();
-        
+
         // 计算当前年龄
         const currentYear = new Date().getFullYear();
         const currentMonth = new Date().getMonth() + 1;
-        let currentAge = currentYear - solarYear;
-        if (currentMonth < solarMonth || (currentMonth === solarMonth)) {
+        let currentAge = currentYear - dayunYear;
+        if (currentMonth < dayunMonth || (currentMonth === dayunMonth)) {
             currentAge--;
         }
-        
+
         // 找到当前大运
         let currentDayunGanZhi = '';
         if (dayunResult.dayun && dayunResult.dayun.length > 0) {
@@ -362,7 +405,7 @@ async function displayRecordData(record) {
                 currentDayunGanZhi = dayunResult.dayun[0].ganzhi;
             }
         }
-        
+
         // 获取当前小运
         let currentXiaoyunGanZhi = '';
         if (dayunResult.xiaoyun && dayunResult.xiaoyun.length > 0) {
@@ -416,13 +459,44 @@ async function displayRecordData(record) {
     }
 }
 
+// ===== 显示大运占位符（干支输入模式无日期时使用） =====
+function displayDayunPlaceholder(isGanzhiMode) {
+    const dayunSection = document.getElementById('dayun-section');
+    if (!dayunSection) return;
+
+    dayunSection.innerHTML = `
+        <div class="section-title">大运小运流年</div>
+        <div class="dayun-placeholder">
+            <div class="dayun-item">
+                <div class="dayun-title">提示</div>
+                <div class="dayun-content">
+                    <div class="liunian-info">
+                        <div>${isGanzhiMode ? '干支输入模式无真实日期，大运小运流年需要真实出生日期才能计算' : '无法获取出生日期信息'}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 // ===== 显示基本信息 =====
 function displayBasicInfo(result, name) {
     document.getElementById('info-name').textContent = name || '匿名';
-    document.getElementById('info-solar').textContent = result.solar_date || '';
-    document.getElementById('info-lunar').textContent = result.lunar_date || '';
-    document.getElementById('info-solar-term').textContent = result.solar_term || '';
-    
+
+    // 判断是否是干支输入记录
+    const isGanzhiInput = result.solar_date && result.solar_date.includes('干支输入');
+
+    if (isGanzhiInput) {
+        // 干支输入记录，显示原始四柱和日期信息
+        document.getElementById('info-solar').textContent = result.solar_date || '';
+        document.getElementById('info-lunar').textContent = result.lunar_date || '';
+        document.getElementById('info-solar-term').textContent = result.solar_term || '';
+    } else {
+        document.getElementById('info-solar').textContent = result.solar_date || '';
+        document.getElementById('info-lunar').textContent = result.lunar_date || '';
+        document.getElementById('info-solar-term').textContent = result.solar_term || '';
+    }
+
     const baziText = `${result.year || ''} ${result.month || ''} ${result.day || ''} ${result.hour || ''}`;
     document.getElementById('info-bazi').textContent = baziText.trim();
 }

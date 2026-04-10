@@ -86,12 +86,14 @@ class BaziCalculator {
       '申': '猴', '酉': '鸡', '戌': '狗', '亥': '猪'
     };
 
+    const yearNayin = this.nayinCalc.getNayin(yearGanzhi);
+
     return {
       'year': yearGanzhi,
       'month': monthGanzhi,
       'day': dayGanzhi,
       'hour': hourGanzhi,
-      'year_nayin': this.nayinCalc.getNayin(yearGanzhi),
+      'year_nayin': yearNayin,
       'month_nayin': this.nayinCalc.getNayin(monthGanzhi),
       'day_nayin': this.nayinCalc.getNayin(dayGanzhi),
       'hour_nayin': this.nayinCalc.getNayin(hourGanzhi),
@@ -125,7 +127,11 @@ class BaziCalculator {
         'month_zhi': this.nayinCalc.getChangshengByNayin(yearGanzhi[0], monthGanzhi[1]),
         'day_zhi': this.nayinCalc.getChangshengByNayin(yearGanzhi[0], dayGanzhi[1]),
         'hour_zhi': this.nayinCalc.getChangshengByNayin(yearGanzhi[0], hourGanzhi[1])
-      }
+      },
+      // 添加三垣计算（使用无太阳位置的简化算法）
+      'taiyuan': this._calculateTaiyuan(monthGanzhi[0], monthGanzhi[1], yearNayin),
+      'minggong': this._calculateMinggong(yearGanzhi[0], monthGanzhi[1], hourGanzhi[1], yearNayin, null),
+      'shengong': this._calculateShengong(yearGanzhi[0], dayGanzhi[0], monthGanzhi[1], hourGanzhi[1], yearNayin, null)
     };
   }
 
