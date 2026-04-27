@@ -1,50 +1,10 @@
-const GAN_LIST = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-const ZHI_LIST = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+import { GAN_LIST, ZHI_LIST, GAN_INDEX, ZHI_INDEX, GAN_NAYIN } from './constants.js';
 
-const GAN_INDEX = {
-    "甲": 0,
-    "乙": 1,
-    "丙": 2,
-    "丁": 3,
-    "戊": 4,
-    "己": 5,
-    "庚": 6,
-    "辛": 7,
-    "壬": 8,
-    "癸": 9,
-};
+// ZHI_SEQUENCE 与 ZHI_LIST 相同，使用 ZHI_LIST 即可
+const ZHI_SEQUENCE = ZHI_LIST;
 
-const ZHI_INDEX = {
-    "子": 0,
-    "丑": 1,
-    "寅": 2,
-    "卯": 3,
-    "辰": 4,
-    "巳": 5,
-    "午": 6,
-    "未": 7,
-    "申": 8,
-    "酉": 9,
-    "戌": 10,
-    "亥": 11,
-};
-
-const ZHI_SEQUENCE = [
-    "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"
-];
-
-const NAYIN_GAN = {
-    "甲": "大林木",
-    "乙": "大林木",
-    "丙": "山头火",
-    "丁": "山头火",
-    "戊": "城头土",
-    "己": "城头土",
-    "庚": "剑锋金",
-    "辛": "剑锋金",
-    "壬": "涧下水",
-    "癸": "涧下水",
-};
+// NAYIN_GAN 使用公共常量 GAN_NAYIN
+const NAYIN_GAN = GAN_NAYIN;
 
 class ShenShaCalculator {
     _get_nayin(ganzhi) {
@@ -1174,11 +1134,10 @@ class ShenShaCalculator {
             "shengong": shengong_zhi,
         };
 
-        const day_gan = day_ganzhi ? day_ganzhi[0] : "";
         const gans = [
             year_gan,
             month_ganzhi ? month_ganzhi[0] : "",
-            day_gan,
+            day_ganzhi ? day_ganzhi[0] : "",
             hour_ganzhi ? hour_ganzhi[0] : "",
         ];
 
@@ -1308,4 +1267,5 @@ function calculate_shensha(
     );
 }
 
-export { GAN_LIST, ZHI_LIST, GAN_INDEX, ZHI_INDEX, ZHI_SEQUENCE, NAYIN_GAN, ShenShaCalculator, calculate_shensha };
+export { ShenShaCalculator, calculate_shensha };
+export { GAN_LIST, ZHI_LIST, GAN_INDEX, ZHI_INDEX } from './constants.js';

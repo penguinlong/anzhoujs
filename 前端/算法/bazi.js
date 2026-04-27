@@ -10,25 +10,7 @@
 import LunarCalendar from './lunar-wrapper.mjs';
 import { getSunPosition, getMoonPosition, calculateMinggongGuolao, calculateShengongGuolao } from './xingyao.js';
 import NayinCalculator from './nayin.mjs';
-
-const GAN_LIST = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-const ZHI_LIST = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-
-const ZHI_INDEX = {
-  '子': 0, '丑': 1, '寅': 2, '卯': 3, '辰': 4, '巳': 5,
-  '午': 6, '未': 7, '申': 8, '酉': 9, '戌': 10, '亥': 11
-};
-
-const HOUR_ZHI_NUM = {
-  '子': 1, '丑': 2, '寅': 3, '卯': 4, '辰': 5, '巳': 6,
-  '午': 7, '未': 8, '申': 9, '酉': 10, '戌': 11, '亥': 12
-};
-
-const HOUR_ZHI_CN = {
-  '子': '子时', '丑': '丑时', '寅': '寅时', '卯': '卯时',
-  '辰': '辰时', '巳': '巳时', '午': '午时', '未': '未时',
-  '申': '申时', '酉': '酉时', '戌': '戌时', '亥': '亥时'
-};
+import { GAN_LIST, ZHI_LIST, ZHI_INDEX, HOUR_ZHI_NUM, HOUR_ZHI_CN, ZHI_ZODIAC } from './constants.js';
 
 function handleMidnightCrossing(year, month, day, hour, minute) {
   if (hour >= 23) {
@@ -80,11 +62,6 @@ class BaziCalculator {
   calculateFromGanzhi(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi) {
     // 获取生肖（根据年支）
     const yearZhi = yearGanzhi[1];
-    const ZHI_ZODIAC = {
-      '子': '鼠', '丑': '牛', '寅': '虎', '卯': '兔',
-      '辰': '龙', '巳': '蛇', '午': '马', '未': '羊',
-      '申': '猴', '酉': '鸡', '戌': '狗', '亥': '猪'
-    };
 
     return {
       'year': yearGanzhi,

@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pkill -f \"python\")",
+      "Bash(python3 -m http.server 8000)",
+      "Bash(pkill -f \"python\\\\|serve\")",
+      "Bash(/c/Python314/python -m http.server 8000)",
+      "Bash(curl -s \"http://localhost:8000/首页排盘/index.html\")",
+      "Bash(ln -sf \"首页排盘\" paipan)",
+      "Bash(ln -sf \"records\" records)",
+      "Bash(ln -sf \"学堂\" study)",
+      "Bash(ln -sf \"用户管理\" settings)",
+      "Bash(curl -s \"http://localhost:8000/\")",
+      "Bash(curl -s \"http://localhost:8000/paipan/\")",
+      "Bash(git reset:*)",
+      "Bash(npx -y serve \"Android/app/src/main/assets/web\" -l 3000)",
+      "Bash(curl -s \"http://localhost:56437/records/\")",
+      "Bash(curl -s \"http://localhost:56437/学堂/\")",
+      "Bash(curl -s -G \"http://localhost:56437/%E5%AD%A6%E5%A0%82/\")",
+      "Bash(curl -s \"http://localhost:56437/%E5%AD%A6%E5%A0%82/index.css\")",
+      "Bash(curl -s \"http://localhost:56437/records/style.css\")",
+      "Bash(curl -s \"http://localhost:56437/records/index.html\")",
+      "Bash(curl -s -G \"http://localhost:56437/records/index.html\")",
+      "Bash(curl -v \"http://localhost:56437/records/index.html\")",
+      "Bash(curl -sL \"http://localhost:56437/records/index\")",
+      "Bash(curl -sL \"http://localhost:56437/%E5%AD%A6%E5%A0%82/index\")",
+      "Bash(pkill -f \"node.*npx.*serve\")",
+      "Bash(npx --yes serve -l 53888 .)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:53888/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:60526/)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(claude mcp:*)"
+    ]
+  }
+}

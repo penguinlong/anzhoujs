@@ -254,13 +254,13 @@ function showRecordDetail(id) {
                 recordId: record.id,
                 recalculate: 'true'
             });
-            window.location.href = `../首页排盘/index.html?${params.toString()}`;
+            window.location.href = `/%E9%A6%96%E9%A1%B5%E6%8E%92%E7%9B%98/?${params.toString()}`;
         }
         return;
     }
     
     const params = new URLSearchParams({ recordId: record.id });
-    window.location.href = `../professional/index.html?${params.toString()}`;
+    window.location.href = `/professional/?${params.toString()}`;
 }
 
 async function showNoteModal(id) {

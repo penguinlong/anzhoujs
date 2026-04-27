@@ -6,9 +6,7 @@
 
 import LunarCalendar from './lunar-wrapper.mjs';
 import NayinCalculator from './nayin.mjs';
-
-const GAN_LIST = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-const ZHI_LIST = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+import { GAN_LIST, ZHI_LIST } from './constants.js';
 
 const JIEQI_NAMES = [
   '立春', '惊蛰', '清明', '立夏', '芒种', '小暑',

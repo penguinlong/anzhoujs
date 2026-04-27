@@ -1,0 +1,1032 @@
+/* ===== 全局样式 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #D4AF37;
+    --primary-dark: #B8962E;
+    --bg-dark: #F5F0E6;
+    --bg-card: #FFFEF9;
+    --bg-input: #FFFFFF;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-muted: #999999;
+    --border-color: rgba(212,175,55,0.3);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.header {
+    background: #FFFFFF;
+    padding: 15px 20px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333333;
+}
+
+.main-content {
+    flex: 1;
+    padding: 15px;
+    padding-bottom: 80px;
+    overflow-y: auto;
+}
+
+/* ===== 卡片 ===== */
+.card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+}
+
+/* ===== 表单 ===== */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group.row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.form-group.row.between {
+    justify-content: space-between;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px 15px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 16px;
+    outline: none;
+}
+
+.input-field:focus {
+    border-color: var(--primary-color);
+}
+
+.select-field {
+    flex: 1;
+    padding: 10px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+}
+
+.date-selects {
+    display: flex;
+    gap: 8px;
+}
+
+.time-select {
+    flex: 1;
+}
+
+.label-text {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+/* ===== 按钮组 ===== */
+.btn-group {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+}
+
+.btn {
+    flex: 1;
+    padding: 10px 16px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #000;
+    font-weight: 600;
+}
+
+/* ===== 开关 ===== */
+.switch {
+    position: relative;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 28px;
+    transition: 0.3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--text-secondary);
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+    background-color: #000;
+}
+
+/* ===== 复选框 ===== */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* ===== 主要按钮 ===== */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: #FFFFFF;
+    border: 1px solid var(--primary-color);
+    border-radius: 10px;
+    color: #333333;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+/* ===== 结果显示 ===== */
+.result-card {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.result-section {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.bazi-display {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.bazi-pillar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 15px;
+    background: var(--bg-input);
+    border-radius: 8px;
+    min-width: 70px;
+}
+
+.bazi-pillar.year {
+    border: 2px solid var(--primary-color);
+}
+
+.bazi-pillar .gan-zhi {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.bazi-pillar .nayin {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.nayin-display, .sanyuan-display, .changsheng-display, .nian-nayin-display {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nayin-item, .sanyuan-item, .changsheng-item, .nian-nayin-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--bg-input);
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.sanyuan-item {
+    border-left: 3px solid var(--primary-color);
+    padding: 12px 15px;
+}
+
+.sanyuan-item .name {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.sanyuan-item .value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.sanyuan-item .nayin-info, .changsheng-item .position {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.ji-xiong {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ji-xiong.ji { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+.ji-xiong.ping { background: rgba(255, 152, 0, 0.2); color: #FF9800; }
+.ji-xiong.xiong { background: rgba(244, 67, 54, 0.2); color: #F44336; }
+
+.hidden {
+    display: none !important;
+}
+
+/* ===== 底部导航 ===== */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    padding: 10px 0;
+    padding-bottom: env(safe-area-inset-bottom, 10px);
+    z-index: 100;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px 15px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.nav-item.active {
+    color: var(--primary-color);
+}
+
+.nav-item:not(.active) {
+    color: var(--text-muted);
+}
+
+.nav-icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+}
+
+.nav-text {
+    font-size: 12px;
+}
+
+/* ===== 新增样式：禄命排盘表格 ===== */
+
+/* 顶部信息栏 */
+.header-info {
+    background: linear-gradient(135deg, #FFF8E7, #FFFEF9);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.info-row:last-child {
+    margin-bottom: 0;
+}
+
+.info-label {
+    color: var(--primary-color);
+    font-weight: 600;
+    min-width: 60px;
+}
+
+.info-value {
+    color: var(--text-primary);
+    flex: 1;
+}
+
+/* 排盘表格 */
+.pai-pan-table {
+    background: #FFF8E7;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 2px solid #D4AF37;
+    min-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.pai-pan-table::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(45px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.header-cell {
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    padding: 10px 0;
+    border-bottom: 2px solid #D4AF37;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(45px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.table-cell {
+    text-align: center;
+    padding: 8px 5px;
+    font-size: 14px;
+    color: #333;
+    min-height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 天干地支样式 */
+.stem-cell {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.branch-cell {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* 五行颜色 */
+.stem-cell.wood { color: #4CAF50; }    /* 木-绿 */
+.stem-cell.fire { color: #F44336; }    /* 火-红 */
+.stem-cell.earth { color: #8D6E63; }   /* 土-棕 */
+.stem-cell.metal { color: #FFC107; }   /* 金-金 */
+.stem-cell.water { color: #2196F3; }   /* 水-蓝 */
+
+.branch-cell.wood { color: #4CAF50; }
+.branch-cell.fire { color: #F44336; }
+.branch-cell.earth { color: #8D6E63; }
+.branch-cell.metal { color: #FFC107; }
+.branch-cell.water { color: #2196F3; }
+
+/* 纳音样式 */
+.nayin-cell {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* 十神样式 */
+.ten-gods-row .table-cell {
+    font-size: 14px;
+    color: #8B4513; /* 棕色 */
+    font-weight: 600;
+}
+
+/* 神煞样式 */
+.shen-sha-cell {
+    font-size: 11px;
+    color: #333;
+    line-height: 1.3;
+    max-height: 80px;
+    overflow-y: auto;
+    white-space: pre-line;
+}
+
+/* 神煞信息样式 */
+.shensha-info {
+    font-size: 10px;
+    color: #666;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.liunian-shensha {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #333;
+    font-size: 11px;
+    color: #999;
+}
+
+/* 三垣部分 */
+.sanyuan-section {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+}
+
+.sanyuan-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.sanyuan-item {
+    text-align: center;
+    padding: 10px;
+    background: rgba(212, 175, 55, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.sanyuan-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.sanyuan-ganzhi {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.sanyuan-nayin {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+}
+
+.sanyuan-changsheng {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* 十二长生部分 */
+.changsheng-section {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+}
+
+.changsheng-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.changsheng-item {
+    background: rgba(212, 175, 55, 0.05);
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.changsheng-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.changsheng-content {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* 大运部分 */
+.dayun-section {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+}
+
+/* 当前流运标题区 */
+.current-liuyun-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.liuyun-item {
+    flex: 1;
+    background: var(--bg-input);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.liuyun-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.dayun-item .liuyun-title { color: #F44336; }
+.xiaoyun-item .liuyun-title { color: #4CAF50; }
+.liunian-item .liuyun-title { color: #2196F3; }
+
+.liuyun-shensha {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.liuyun-shensha .shensha-item {
+    display: inline-block;
+    margin-right: 8px;
+    margin-bottom: 2px;
+}
+
+.liuyun-shensha .shensha-good { color: #F44336; }
+.liuyun-shensha .shensha-bad { color: #333; }
+
+.dayun-placeholder {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.dayun-item-old {
+    text-align: center;
+    padding: 15px;
+    background: rgba(153, 153, 153, 0.1);
+    border-radius: 8px;
+    border: 1px dashed rgba(153, 153, 153, 0.3);
+}
+
+.dayun-title-old {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.dayun-content {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* 大运小运表格容器 */
+.dayun-table-container, .xiaoyun-table-container {
+    margin-bottom: 15px;
+}
+
+.dayun-subtitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* 横向滚动表格 */
+.dayun-table-scroll, .xiaoyun-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.dayun-table, .xiaoyun-table {
+    border-collapse: collapse;
+    min-width: 100%;
+}
+
+.dayun-table th, .dayun-table td,
+.xiaoyun-table th, .xiaoyun-table td {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px 8px;
+    text-align: center;
+    font-size: 12px;
+    min-width: 60px;
+}
+
+.dayun-label-cell {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--primary-color);
+    font-weight: 600;
+    min-width: 50px !important;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+}
+
+.dayun-table th:first-child, .dayun-table td:first-child,
+.xiaoyun-table th:first-child, .xiaoyun-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+}
+
+.dayun-header-row th {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--primary-color);
+}
+
+.ten-god-cell {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+.ganzhi-cell {
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.ganzhi-cell.clickable {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ganzhi-cell.clickable:hover {
+    background-color: rgba(212, 175, 55, 0.2);
+}
+
+.ganzhi-cell.selected {
+    background-color: rgba(212, 175, 55, 0.4);
+    color: #fff;
+}
+
+.nayin-cell {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.age-cell {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.date-cell {
+    color: var(--text-secondary);
+    font-size: 10px;
+}
+
+/* 五行颜色 */
+.wuxing-mu { color: #4CAF50; }
+.wuxing-huo { color: #F44336; }
+.wuxing-tu { color: #8D6E63; }
+.wuxing-jin { color: #9E9E9E; }
+.wuxing-shui { color: #2196F3; }
+
+/* 旧样式保留 */
+.liunian-info {
+    font-size: 12px;
+    text-align: left;
+}
+
+.liunian-detail {
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+}
+
+.error {
+    color: #F44336;
+    text-align: center;
+}
+
+/* 响应式设计 */
+@media (max-width: 400px) {
+    .dayun-placeholder {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .dayun-detail, .xiaoyun-detail {
+        font-size: 10px;
+    }
+}
+
+/* 底部功能按钮 */
+.bottom-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+.action-btn {
+    background: var(--primary-color);
+    color: #000;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+/* 响应式设计 - 小屏优化 */
+@media (max-width: 480px) {
+    .table-header, .table-row {
+        gap: 3px;
+    }
+    
+    .header-cell {
+        font-size: 10px;
+        padding: 4px 0;
+    }
+    
+    .stem-cell, .branch-cell {
+        font-size: 16px;
+    }
+    
+    .ten-gods-row .table-cell {
+        font-size: 9px;
+    }
+    
+    .nayin-cell {
+        font-size: 8px;
+    }
+    
+    .shen-sha-cell {
+        font-size: 8px;
+        max-height: 50px;
+    }
+    
+    .sanyuan-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .changsheng-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dayun-placeholder {
+        grid-template-columns: 1fr;
+    }
+    
+}
+
+/* 中等屏幕适配 */
+@media (max-width: 768px) {
+}
+
+/* 五行颜色类 */
+.wuxing-wood { color: #4CAF50 !important; }
+.wuxing-fire { color: #F44336 !important; }
+.wuxing-earth { color: #8D6E63 !important; }
+.wuxing-metal { color: #FFC107 !important; }
+.wuxing-water { color: #2196F3 !important; }
+
+/* 吉凶颜色 */
+.ji-xiong-ji { color: #4CAF50 !important; }
+.ji-xiong-ping { color: #FF9800 !important; }
+.ji-xiong-xiong { color: #F44336 !important; }
+
+/* 隐藏类 */
+.hidden {
+    display: none !important;
+}
+
+/* 时区和位置样式 */
+#current-time, #current-location {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+}
+
+#refresh-location {
+    background: #FFFFFF;
+    color: #333333;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#refresh-location:hover {
+    background: #F5F0E6;
+    color: #333333;
+}
+
+#timezone {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+
+/* ===== 流年小运弹窗 ===== */
+.liuyun-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    overflow: auto;
+}
+
+.liuyun-modal.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: #000;
+}
+
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #000;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.liuyun-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 15px;
+}
+
+.liuyun-table {
+    border-collapse: collapse;
+    min-width: 100%;
+}
+
+.liuyun-table th, .liuyun-table td {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 8px 10px;
+    text-align: center;
+    font-size: 13px;
+    min-width: 60px;
+}
+
+.liuyun-label-cell {
+    background: rgba(212, 175, 55, 0.15);
+    color: var(--primary-color);
+    font-weight: 600;
+    min-width: 50px !important;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+}
+
+.liuyun-header-row th {
+    background: rgba(33, 150, 243, 0.2);
+    color: #2196F3;
+}
+
+.liuyun-year-cell {
+    color: #2196F3;
+    font-weight: bold;
+}
+
+.liuyun-liunian-cell {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.liuyun-xiaoyun-cell {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.liuyun-nayin-cell {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.liuyun-age-cell {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
