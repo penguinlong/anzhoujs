@@ -1114,6 +1114,7 @@ class ShenShaCalculator {
         const year_gan = year_ganzhi ? year_ganzhi[0] : "";
         const year_zhi = year_ganzhi && year_ganzhi.length > 1 ? year_ganzhi[1] : "";
         const month_zhi = month_ganzhi && month_ganzhi.length > 1 ? month_ganzhi[1] : "";
+        const day_gan = day_ganzhi ? day_ganzhi[0] : "";
         const day_zhi = day_ganzhi && day_ganzhi.length > 1 ? day_ganzhi[1] : "";
         const hour_zhi = hour_ganzhi && hour_ganzhi.length > 1 ? hour_ganzhi[1] : "";
 

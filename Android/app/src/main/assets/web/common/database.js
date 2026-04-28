@@ -476,7 +476,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// 导出
+// 导出到全局对象，确保所有脚本都能访问
+window.db = db;
+
+// CommonJS 导出（Node.js 环境）
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { LumingDatabase, db };
 }

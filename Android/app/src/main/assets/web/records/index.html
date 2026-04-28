@@ -4,6 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>禄命排盘 - 记录</title>
+    <!-- 确保URL以斜杠结尾，解决相对路径问题 -->
+    <script>
+        console.log('[Records URL Redirect Debug] 记录页面加载，路径:', location.pathname);
+        console.log('[Records URL Redirect Debug] 查询参数:', location.search);
+        console.log('[Records URL Redirect Debug] 完整URL:', location.href);
+
+        // 如果路径已经包含index.html，绝对不重定向
+        if (location.pathname.includes('index.html')) {
+            console.log('[Records URL Redirect Debug] 路径包含index.html，跳过重定向');
+            // 直接退出，不执行任何重定向逻辑
+        } else {
+            // 只对目录路径（没有文件扩展名）添加斜杠，避免对.html文件添加斜杠
+            const hasFileExtension = /\.(html|js|css|json|png|jpg|jpeg|gif|svg|ico)$/i.test(location.pathname);
+            console.log('[Records URL Redirect Debug] 是否以文件扩展名结尾:', hasFileExtension);
+            console.log('[Records URL Redirect Debug] 是否以斜杠结尾:', location.pathname.endsWith('/'));
+
+            if (location.pathname !== '/' && !location.pathname.endsWith('/') && !hasFileExtension) {
+                console.log('[Records URL Redirect Debug] 执行重定向到目录格式');
+                location.pathname += '/';
+                console.log('[Records URL Redirect Debug] 重定向后的路径:', location.pathname);
+            } else {
+                console.log('[Records URL Redirect Debug] 不需要重定向');
+            }
+        }
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -53,7 +78,7 @@
         </button>
 
         <nav class="bottom-nav">
-            <div class="nav-item" data-page="paipan" onclick="window.location.href='/%E9%A6%96%E9%A1%B5%E6%8E%92%E7%9B%98/'">
+            <div class="nav-item" data-page="paipan" onclick="window.location.href='../首页排盘/index.html'">
                 <svg class="nav-icon" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
                     <path d="M12 2 C12 12, 12 12, 22 12" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -69,7 +94,7 @@
                 </svg>
                 <span class="nav-text">记录</span>
             </div>
-            <div class="nav-item" data-page="study" onclick="window.location.href='/%E5%AD%A6%E5%A0%82/'">
+            <div class="nav-item" data-page="study" onclick="window.location.href='../学堂/index.html'">
                 <svg class="nav-icon" viewBox="0 0 24 24">
                     <path d="M4 4 L12 8 L20 4 L20 16 L12 20 L4 16 Z" stroke="currentColor" stroke-width="2" fill="none"/>
                     <line x1="12" y1="8" x2="12" y2="20" stroke="currentColor" stroke-width="2"/>

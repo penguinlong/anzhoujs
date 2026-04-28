@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>用户管理</title>
+    <!-- 确保URL以斜杠结尾，解决相对路径问题 -->
+    <script>
+        // 只对目录路径（没有文件扩展名）添加斜杠，避免对.html文件添加斜杠
+        if (location.pathname !== '/' && !location.pathname.endsWith('/') && !/\.(html|js|css|json|png|jpg|jpeg|gif|svg|ico)$/i.test(location.pathname)) {
+            location.pathname += '/';
+        }
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -153,7 +160,7 @@
         </div>
 
         <nav class="bottom-nav">
-            <div class="nav-item" onclick="window.location.href='/%E9%A6%96%E9%A1%B5%E6%8E%92%E7%9B%98/'">
+            <div class="nav-item" onclick="window.location.href='../首页排盘/index.html'">
                 <svg class="nav-icon" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
                     <path d="M12 2 C12 12, 12 12, 22 12" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -161,7 +168,7 @@
                 </svg>
                 <span class="nav-text">排盘</span>
             </div>
-            <div class="nav-item" onclick="window.location.href='/records/'">
+            <div class="nav-item" onclick="window.location.href='../records/index.html'">
                 <svg class="nav-icon" viewBox="0 0 24 24">
                     <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
                     <line x1="8" y1="9" x2="16" y2="9" stroke="currentColor" stroke-width="2"/>

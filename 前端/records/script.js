@@ -242,25 +242,33 @@ function closeAllWrappers() {
 }
 
 function showRecordDetail(id) {
+    console.log('[showRecordDetail] 函数被调用，id:', id);
+    console.log('[showRecordDetail] allRecords 长度:', allRecords.length);
+
     const record = allRecords.find(r => r.id === id);
     if (!record) {
+        console.error('[showRecordDetail] 未找到记录，id:', id);
         alert('未找到记录');
         return;
     }
-    
-    if (!record.fullData) {
-        if (confirm('该记录没有完整的排盘数据，是否重新计算？')) {
-            const params = new URLSearchParams({
-                recordId: record.id,
-                recalculate: 'true'
-            });
-            window.location.href = `../首页排盘/index.html?${params.toString()}`;
-        }
-        return;
-    }
-    
+
+    console.log('[showRecordDetail] record:', record);
+    console.log('[showRecordDetail] fullData:', record.fullData);
+    console.log('[showRecordDetail] record.id:', record.id);
+    console.log('[showRecordDetail] record.name:', record.name);
+
+    // 无论是否有 fullData，都跳转到专业页面
+    // 专业页面会处理数据加载和重新计算
     const params = new URLSearchParams({ recordId: record.id });
-    window.location.href = `../professional/index.html?${params.toString()}`;
+    // 使用绝对路径，避免相对路径问题
+    const targetUrl = `/professional/?${params.toString()}`;
+    console.log('[showRecordDetail] 跳转URL:', targetUrl);
+
+    // 添加延迟以便看到日志
+    setTimeout(() => {
+        console.log('[showRecordDetail] 执行跳转');
+        window.location.href = targetUrl;
+    }, 100);
 }
 
 async function showNoteModal(id) {

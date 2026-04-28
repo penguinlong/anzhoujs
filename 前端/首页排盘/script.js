@@ -46,6 +46,31 @@ function getValidMonthGans(yearGan) {
     return gans.map((_, i) => gans[(startIdx + i) % 10]);
 }
 
+// ===== 五行颜色 =====
+const WUXING_COLORS = {
+    '木': 'wuxing-mu',
+    '火': 'wuxing-huo',
+    '土': 'wuxing-tu',
+    '金': 'wuxing-jin',
+    '水': 'wuxing-shui'
+};
+
+// ===== 五行对应的天干 =====
+const GAN_WUXING = {
+    '甲': '木', '乙': '木',
+    '丙': '火', '丁': '火',
+    '戊': '土', '己': '土',
+    '庚': '金', '辛': '金',
+    '壬': '水', '癸': '水'
+};
+
+// ===== 地支五行 =====
+const ZHI_WUXING = {
+    '子': '水', '丑': '土', '寅': '木', '卯': '木',
+    '辰': '土', '巳': '火', '午': '火', '未': '土',
+    '申': '金', '酉': '金', '戌': '土', '亥': '水'
+};
+
 // ===== 五鼠遁元函数 =====
 function getWuShuDunDay(dayGan) {
     const wushu_map = {
@@ -65,6 +90,94 @@ function getValidHourGans(dayGan) {
     return gans.map((_, i) => gans[(startIdx + i) % 10]);
 }
 
+// ===== 十神计算函数 =====
+function getTenGod(baseGan, targetGan) {
+    if (!baseGan || !targetGan) return '';
+
+    // 天干五行属性映射
+    const ganWuxing = {
+        '甲': '木', '乙': '木',
+        '丙': '火', '丁': '火',
+        '戊': '土', '己': '土',
+        '庚': '金', '辛': '金',
+        '壬': '水', '癸': '水'
+    };
+
+    // 天干阴阳属性映射 (甲丙戊庚壬为阳, 乙丁己辛癸为阴)
+    const ganYinyang = {
+        '甲': '阳', '乙': '阴',
+        '丙': '阳', '丁': '阴',
+        '戊': '阳', '己': '阴',
+        '庚': '阳', '辛': '阴',
+        '壬': '阳', '癸': '阴'
+    };
+
+    const baseWuxing = ganWuxing[baseGan];
+    const targetWuxing = ganWuxing[targetGan];
+    const baseYinyang = ganYinyang[baseGan];
+    const targetYinyang = ganYinyang[targetGan];
+
+    if (!baseWuxing || !targetWuxing) return '';
+
+    // 相同五行
+    if (baseWuxing === targetWuxing) {
+        if (baseYinyang === targetYinyang) {
+            return '比肩';
+        } else {
+            return '劫财';
+        }
+    }
+
+    // 五行生克关系
+    const shengke = {
+        '木': {'生': '火', '克': '土', '被生': '水', '被克': '金'},
+        '火': {'生': '土', '克': '金', '被生': '木', '被克': '水'},
+        '土': {'生': '金', '克': '水', '被生': '火', '被克': '木'},
+        '金': {'生': '水', '克': '木', '被生': '土', '被克': '火'},
+        '水': {'生': '木', '克': '火', '被生': '金', '被克': '土'}
+    };
+
+    const relations = shengke[baseWuxing];
+
+    // 目标生我 (印星)
+    if (targetWuxing === relations['被生']) {
+        if (baseYinyang === targetYinyang) {
+            return '偏印';
+        } else {
+            return '正印';
+        }
+    }
+
+    // 我生目标 (食伤)
+    if (targetWuxing === relations['生']) {
+        if (baseYinyang === targetYinyang) {
+            return '食神';
+        } else {
+            return '伤官';
+        }
+    }
+
+    // 目标克我 (官杀)
+    if (targetWuxing === relations['被克']) {
+        if (baseYinyang === targetYinyang) {
+            return '七杀';
+        } else {
+            return '正官';
+        }
+    }
+
+    // 我克目标 (财星)
+    if (targetWuxing === relations['克']) {
+        if (baseYinyang === targetYinyang) {
+            return '偏财';
+        } else {
+            return '正财';
+        }
+    }
+
+    return '';
+}
+
 // ===== 60甲子校验 =====
 function isValidYearGanzhi(ganzhi) {
     return JIAZI_60.includes(ganzhi);
@@ -72,6 +185,52 @@ function isValidYearGanzhi(ganzhi) {
 
 function isValidDayGanzhi(ganzhi) {
     return JIAZI_60.includes(ganzhi);
+}
+
+// ===== 时柱干支选项（五鼠遁联动校验）=====
+function getValidHourGanzhiOptions(dayGan) {
+    if (!dayGan) return JIAZI_60;
+    const validGans = getValidHourGans(dayGan);
+    return JIAZI_60.filter(gz => validGans.includes(gz[0]));
+}
+
+// ===== 月柱干支选项（五虎遁联动校验）=====
+function getValidMonthGanzhiOptions(yearGan) {
+    if (!yearGan) return JIAZI_60;
+    const validGans = getValidMonthGans(yearGan);
+    return JIAZI_60.filter(gz => validGans.includes(gz[0]));
+}
+
+// ===== 更新天干选择器的禁用状态（联动校验）=====
+function updateGanPickerDisabledStates(pillar) {
+    const tooltip = document.getElementById('gan-picker-tooltip');
+    if (!tooltip) return;
+
+    let validGans = null;
+
+    if (pillar === 'month') {
+        // 月柱天干根据年柱天干过滤（五虎遁）
+        const yearGan = ganzhiModalState.year.gan;
+        if (yearGan) {
+            validGans = getValidMonthGans(yearGan);
+        }
+    } else if (pillar === 'hour') {
+        // 时柱天干根据日柱天干过滤（五鼠遁）
+        const dayGan = ganzhiModalState.day.gan;
+        if (dayGan) {
+            validGans = getValidHourGans(dayGan);
+        }
+    }
+
+    // 更新禁用状态
+    tooltip.querySelectorAll('.picker-item').forEach(item => {
+        const gan = item.dataset.gan;
+        if (validGans) {
+            item.classList.toggle('disabled', !validGans.includes(gan));
+        } else {
+            item.classList.remove('disabled');
+        }
+    });
 }
 
 // ===== 动态获取农历闰月 =====
@@ -103,20 +262,31 @@ let _algoModules = null;
 async function loadAlgorithmModules() {
     if (_algoModules) return _algoModules;
     const basePath = '../算法/';
-    const [baziModule, liunianModule, shenshaModule, dayunModule] = await Promise.all([
-        import(basePath + 'bazi.js'),
-        import(basePath + 'liunian.js'),
-        import(basePath + 'shensha.js'),
-        import(basePath + 'dayun.js')
-    ]);
-    _algoModules = {
-        calculateBazi: baziModule.calculateBazi,
-        getCurrentLiuNian: liunianModule.getCurrentLiuNian,
-        getYearsLiuNian: liunianModule.getYearsLiuNian,
-        calculateShenSha: shenshaModule.calculate_shensha,
-        calculateDayun: dayunModule.calculateDayunXiaoyun
-    };
-    return _algoModules;
+    try {
+        const [baziModule, liunianModule, shenshaModule, dayunModule] = await Promise.all([
+            import(basePath + 'bazi.js'),
+            import(basePath + 'liunian.js'),
+            import(basePath + 'shensha.js'),
+            import(basePath + 'dayun.js')
+        ]);
+        console.log('Algorithm modules loaded:', {
+            bazi: baziModule,
+            liunian: liunianModule,
+            shensha: shenshaModule,
+            dayun: dayunModule
+        });
+        _algoModules = {
+            calculateBazi: baziModule.calculateBazi,
+            getCurrentLiuNian: liunianModule.getCurrentLiuNian,
+            getYearsLiuNian: liunianModule.getYearsLiuNian,
+            calculateShenSha: shenshaModule.calculate_shensha,
+            calculateDayun: dayunModule.calculateDayunXiaoyun
+        };
+        return _algoModules;
+    } catch (error) {
+        console.error('Failed to load algorithm modules:', error);
+        throw error;
+    }
 }
 
 // ===== 初始化 =====
@@ -243,24 +413,55 @@ function showPickerTooltip(pillar, type, targetBtn) {
     const tooltip = document.getElementById(type === 'gan' ? 'gan-picker-tooltip' : 'zhi-picker-tooltip');
     const rect = targetBtn.getBoundingClientRect();
 
-    // 定位浮层
-    tooltip.style.left = rect.left + 'px';
-    tooltip.style.top = (rect.top - 10) + 'px';
-
-    // 调整位置确保不超出屏幕
-    const tooltipRect = tooltip.getBoundingClientRect();
-    if (tooltipRect.right > window.innerWidth) {
-        tooltip.style.left = (window.innerWidth - tooltipRect.width - 10) + 'px';
-    }
-    if (tooltipRect.top < 0) {
-        tooltip.style.top = rect.bottom + 10 + 'px';
-    }
-
+    // 先显示浮层以获取正确的尺寸
     tooltip.classList.add('active');
+
+    // 使用 requestAnimationFrame 确保 DOM 更新后再定位
+    requestAnimationFrame(() => {
+        const tooltipRect = tooltip.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        // 计算水平位置 - 窄屏时居中显示
+        let left;
+        if (windowWidth <= 400) {
+            // 窄屏时居中
+            left = (windowWidth - tooltipRect.width) / 2;
+        } else {
+            // 正常屏幕时对齐按钮
+            left = rect.left;
+            // 确保不超出右边界
+            if (left + tooltipRect.width > windowWidth - 10) {
+                left = windowWidth - tooltipRect.width - 10;
+            }
+        }
+        // 确保不超出左边界
+        left = Math.max(10, left);
+
+        // 计算垂直位置
+        let top = rect.top - tooltipRect.height - 10;
+        // 如果上方空间不足，显示在下方
+        if (top < 10) {
+            top = rect.bottom + 10;
+        }
+        // 确保不超出底部边界
+        if (top + tooltipRect.height > windowHeight - 10) {
+            top = windowHeight - tooltipRect.height - 10;
+        }
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    });
+
     currentPickerTarget = targetBtn;
 
     // 更新选中状态
     updatePickerTooltipSelection(pillar, type);
+
+    // 更新天干选择器的禁用状态（联动校验）
+    if (type === 'gan') {
+        updateGanPickerDisabledStates(pillar);
+    }
 }
 
 // ===== 更新浮层选中状态 =====
@@ -328,6 +529,26 @@ function checkGanzhiCombination(pillar) {
         }
     }
 
+    // 日柱变化时，检查时干是否符合五鼠遁规则
+    if (pillar === 'day' && hourGan) {
+        const validHourGans = getValidHourGans(dayGan);
+        if (!validHourGans.includes(hourGan)) {
+            // 清空时干
+            ganzhiModalState.hour.gan = null;
+            updateGanzhiButtons();
+        }
+    }
+
+    // 年柱变化时，检查月干是否符合五虎遁规则
+    if (pillar === 'year' && monthGan) {
+        const validMonthGans = getValidMonthGans(yearGan);
+        if (!validMonthGans.includes(monthGan)) {
+            // 清空月干
+            ganzhiModalState.month.gan = null;
+            updateGanzhiButtons();
+        }
+    }
+
     // 五虎遁检查
     if (pillar === 'year' || pillar === 'month') {
         if (yearGan && monthGan) {
@@ -335,19 +556,6 @@ function checkGanzhiCombination(pillar) {
             if (!validGans.includes(monthGan)) {
                 tip.textContent = '月干违反五虎遁规则';
                 ganzhiModalState.month.gan = null;
-                updateGanzhiButtons();
-                return false;
-            }
-        }
-    }
-
-    // 五鼠遁检查
-    if (pillar === 'day' || pillar === 'hour') {
-        if (dayGan && hourGan) {
-            const validGans = getValidHourGans(dayGan);
-            if (!validGans.includes(hourGan)) {
-                tip.textContent = '时干违反五鼠遁规则';
-                ganzhiModalState.hour.gan = null;
                 updateGanzhiButtons();
                 return false;
             }
@@ -462,7 +670,7 @@ async function calculateFromSolar(year, month, day, hour, minute) {
 
         baziResult.name = name;
         displayResult(baziResult);
-        await saveRecord({ name, gender, date_type: 'solar', solar_year: year, solar_month: month, solar_day: day, hour, minute }, baziResult);
+        await saveRecord({ name, gender, date_type: 'solar', solar_year: year, solar_month: month, solar_day: day, hour, minute, longitude, use_true_solar: useTrueSolar }, baziResult);
 
     } catch (error) {
         alert('计算失败: ' + error.message);
@@ -491,7 +699,7 @@ async function calculateFromLunar(year, month, day, hour, minute, isLeapMonth) {
 
         baziResult.name = name;
         displayResult(baziResult);
-        await saveRecord({ name, gender, date_type: 'lunar', lunar_year: year, lunar_month: month, lunar_day: day, is_leap_month: isLeapMonth, hour, minute }, baziResult);
+        await saveRecord({ name, gender, date_type: 'lunar', lunar_year: year, lunar_month: month, lunar_day: day, is_leap_month: isLeapMonth, hour, minute, longitude, use_true_solar: useTrueSolar }, baziResult);
 
     } catch (error) {
         alert('计算失败: ' + error.message);
@@ -502,6 +710,7 @@ async function calculateFromLunar(year, month, day, hour, minute, isLeapMonth) {
 
 // ===== 从干支计算 =====
 async function calculateFromGanzhi(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi) {
+    console.log('calculateFromGanzhi called with:', { yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi });
     const name = document.getElementById('name').value || '匿名';
     const gender = document.querySelector('#gender-group .btn-gender.active').dataset.value;
 
@@ -509,15 +718,25 @@ async function calculateFromGanzhi(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzh
         showLoading(true);
         const algo = await loadAlgorithmModules();
 
+        const ganzhiInput = {
+            year: yearGanzhi,
+            month: monthGanzhi,
+            day: dayGanzhi,
+            hour: hourGanzhi
+        };
+        console.log('calculateFromGanzhi: ganzhiInput =', ganzhiInput);
+
         const baziResult = algo.calculateBazi(0, 0, 0, 0, 0, {
             isLunar: false,
             isGanzhi: true,
-            ganzhiInput: {
-                year: yearGanzhi,
-                month: monthGanzhi,
-                day: dayGanzhi,
-                hour: hourGanzhi
-            }
+            ganzhiInput: ganzhiInput
+        });
+
+        console.log('calculateFromGanzhi: baziResult =', baziResult);
+        console.log('calculateFromGanzhi: 三垣 =', {
+            taiyuan: baziResult.taiyuan,
+            minggong: baziResult.minggong,
+            shengong: baziResult.shengong
         });
 
         baziResult.name = name;
@@ -546,7 +765,9 @@ function initModalDateSelectors() {
     const modalDaySelect = document.getElementById('modal-day-select');
 
     const currentYear = new Date().getFullYear();
-    for (let y = 1900; y <= 2077; y++) {
+
+    // 公历年份：1801~2099年，用户可滚动选择
+    for (let y = 1801; y <= 2099; y++) {
         const opt = document.createElement('option');
         opt.value = y;
         opt.textContent = y + '年';
@@ -576,7 +797,8 @@ function initModalDateSelectors() {
     const modalLunarMonthSelect = document.getElementById('modal-lunar-month-select');
     const modalLunarDaySelect = document.getElementById('modal-lunar-day-select');
 
-    for (let y = 1900; y <= 2077; y++) {
+    // 农历年份：1801~2099年，用户可滚动选择
+    for (let y = 1801; y <= 2099; y++) {
         const opt = document.createElement('option');
         opt.value = y;
         opt.textContent = y + '年';
@@ -643,12 +865,18 @@ function initDateSelectors() {
     const daySelect = document.getElementById('day-select');
 
     const currentYear = new Date().getFullYear();
-    for (let y = 1900; y <= 2077; y++) {
+
+    // 初始化隐藏的原生select（用于表单提交）
+    for (let y = 1801; y <= 2099; y++) {
         const option = document.createElement('option');
         option.value = y;
         option.textContent = y + '年';
         yearSelect.appendChild(option);
     }
+    yearSelect.value = currentYear;
+
+    // 初始化自定义年份选择器
+    initCustomYearSelect(currentYear);
 
     for (let m = 1; m <= 12; m++) {
         const option = document.createElement('option');
@@ -666,6 +894,145 @@ function initDateSelectors() {
 
     yearSelect.addEventListener('change', updateMonths);
     monthSelect.addEventListener('change', updateDays);
+}
+
+// ===== 自定义年份选择器 =====
+function initCustomYearSelect(currentYear) {
+    const wrapper = document.getElementById('year-select-wrapper');
+    const trigger = document.getElementById('year-select-trigger');
+    const dropdown = document.getElementById('year-select-dropdown');
+    const optionsContainer = document.getElementById('year-select-options');
+    const textSpan = trigger.querySelector('.custom-select-text');
+    const hiddenSelect = document.getElementById('year-select');
+
+    // 填充年份选项
+    optionsContainer.innerHTML = '';
+    for (let y = 1801; y <= 2099; y++) {
+        const option = document.createElement('div');
+        option.className = 'custom-select-option';
+        option.dataset.value = y;
+        option.textContent = y + '年';
+        if (y === currentYear) {
+            option.classList.add('selected');
+        }
+        optionsContainer.appendChild(option);
+    }
+
+    // 设置初始显示文本
+    textSpan.textContent = currentYear + '年';
+
+    // 点击展开/收起下拉列表
+    trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isOpen = dropdown.classList.contains('active');
+        closeAllCustomSelects();
+        if (!isOpen) {
+            dropdown.classList.add('active');
+            trigger.classList.add('active');
+            // 滚动到选中项
+            const selectedOption = optionsContainer.querySelector('.custom-select-option.selected');
+            if (selectedOption) {
+                scrollToOption(optionsContainer, selectedOption);
+            }
+        }
+    });
+
+    // 选择年份
+    optionsContainer.addEventListener('click', function(e) {
+        const option = e.target.closest('.custom-select-option');
+        if (option) {
+            selectYear(option);
+        }
+    });
+
+    // 滚动选择功能
+    let scrollTimeout;
+    optionsContainer.addEventListener('scroll', function() {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(function() {
+            const visibleOptions = getVisibleOptions(optionsContainer);
+            if (visibleOptions.center) {
+                // 更新选中状态（可选，如果希望滚动时自动选中中间项）
+            }
+        }, 100);
+    });
+
+    // 选择年份函数
+    function selectYear(option) {
+        const value = parseInt(option.dataset.value);
+
+        // 更新显示
+        optionsContainer.querySelectorAll('.custom-select-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        option.classList.add('selected');
+        textSpan.textContent = value + '年';
+
+        // 更新隐藏的原生select
+        hiddenSelect.value = value;
+
+        // 触发change事件
+        hiddenSelect.dispatchEvent(new Event('change'));
+
+        // 关闭下拉列表
+        dropdown.classList.remove('active');
+        trigger.classList.remove('active');
+    }
+
+    // 关闭所有自定义选择器
+    function closeAllCustomSelects() {
+        document.querySelectorAll('.custom-select-dropdown').forEach(d => {
+            d.classList.remove('active');
+        });
+        document.querySelectorAll('.custom-select-trigger').forEach(t => {
+            t.classList.remove('active');
+        });
+    }
+
+    // 点击外部关闭
+    document.addEventListener('click', function(e) {
+        if (!wrapper.contains(e.target)) {
+            dropdown.classList.remove('active');
+            trigger.classList.remove('active');
+        }
+    });
+
+    // 滚动到指定选项（显示在中间位置）
+    function scrollToOption(container, option) {
+        const containerHeight = container.clientHeight;
+        const optionHeight = option.offsetHeight;
+        const optionTop = option.offsetTop;
+        const scrollTop = optionTop - (containerHeight / 2) + (optionHeight / 2);
+        container.scrollTop = Math.max(0, scrollTop);
+    }
+
+    // 获取当前可见的选项
+    function getVisibleOptions(container) {
+        const containerHeight = container.clientHeight;
+        const scrollTop = container.scrollTop;
+        const options = container.querySelectorAll('.custom-select-option');
+        const visible = [];
+        let center = null;
+        let minDistance = Infinity;
+
+        options.forEach(option => {
+            const optionTop = option.offsetTop;
+            const optionHeight = option.offsetHeight;
+            const optionCenter = optionTop + optionHeight / 2;
+            const containerCenter = scrollTop + containerHeight / 2;
+
+            if (optionTop >= scrollTop && optionTop < scrollTop + containerHeight) {
+                visible.push(option);
+                const distance = Math.abs(optionCenter - containerCenter);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    center = option;
+                }
+            }
+        });
+
+        return { visible, center };
+    }
 }
 
 function updateMonths() {
@@ -792,7 +1159,23 @@ async function calculateBazi() {
 
         baziResult.name = name;
         displayResult(baziResult);
-        await saveRecord({ name, gender, date_type: currentDateType, solar_year: year, solar_month: month, solar_day: day, is_leap_month: isLeapMonth, hour, minute }, baziResult);
+
+        // 根据日期类型使用正确的字段名保存记录
+        if (isLunar) {
+            await saveRecord({
+                name, gender, date_type: 'lunar',
+                lunar_year: year, lunar_month: month, lunar_day: day,
+                is_leap_month: isLeapMonth, hour, minute,
+                longitude, use_true_solar: useTrueSolar
+            }, baziResult);
+        } else {
+            await saveRecord({
+                name, gender, date_type: 'solar',
+                solar_year: year, solar_month: month, solar_day: day,
+                hour, minute,
+                longitude, use_true_solar: useTrueSolar
+            }, baziResult);
+        }
 
     } catch (error) {
         alert('计算失败: ' + error.message);
@@ -808,41 +1191,212 @@ function showLoading(show) {
 }
 
 async function displayResult(result) {
-    const resultCard = document.getElementById('result-card');
-    resultCard.style.display = 'block';
+    console.log('[displayResult] ============================================');
+    console.log('[displayResult] 开始显示结果');
+    console.log('[displayResult] result 类型:', typeof result);
+    console.log('[displayResult] result 是否为 null:', result === null);
+    console.log('[displayResult] result 是否为 undefined:', result === undefined);
+    console.log('[displayResult] result 所有字段:', result ? Object.keys(result) : 'N/A');
+    console.log('[displayResult] 完整数据:', JSON.stringify(result, null, 2));
+    console.log('[displayResult] 三垣数据检查:', {
+        taiyuan: result?.taiyuan,
+        minggong: result?.minggong,
+        shengong: result?.shengong
+    });
+    console.log('[displayResult] 四柱数据检查:', {
+        year: result?.year,
+        month: result?.month,
+        day: result?.day,
+        hour: result?.hour
+    });
 
+    const resultCard = document.getElementById('result-card');
+    if (resultCard) {
+        resultCard.style.display = 'block';
+        console.log('[displayResult] 结果卡片已显示');
+    } else {
+        console.warn('[displayResult] 找不到结果卡片元素 result-card');
+    }
+
+    console.log('[displayResult] 调用 displayHeaderInfo...');
     displayHeaderInfo(result);
+
+    console.log('[displayResult] 调用 displayPaiPanTable...');
     await displayPaiPanTable(result);
+
+    console.log('[displayResult] 调用 displaySanyuan...');
     displaySanyuan(result);
+
+    console.log('[displayResult] 调用 displayChangshengDetails...');
     displayChangshengDetails(result);
+
+    console.log('[displayResult] 调用 displayDayunLiunian...');
     await displayDayunLiunian(result);
 
-    resultCard.scrollIntoView({ behavior: 'smooth' });
+    if (resultCard) {
+        resultCard.scrollIntoView({ behavior: 'smooth' });
+    }
+    console.log('[displayResult] 显示结果完成');
+    console.log('[displayResult] ============================================');
 }
 
 function displayHeaderInfo(result) {
-    document.getElementById('info-name').textContent = result.name || '匿名';
-    document.getElementById('info-solar').textContent = result.solar_date || '';
-    document.getElementById('info-lunar').textContent = result.lunar_date || '';
-    document.getElementById('info-solar-term').textContent = result.solar_term || '';
+    console.log('[displayHeaderInfo] 开始显示头部信息');
+    console.log('[displayHeaderInfo] result 类型:', typeof result);
+    console.log('[displayHeaderInfo] result 字段:', Object.keys(result || {}));
+
+    const nameEl = document.getElementById('info-name');
+    const solarEl = document.getElementById('info-solar');
+    const lunarEl = document.getElementById('info-lunar');
+    const termEl = document.getElementById('info-solar-term');
+
+    console.log('[displayHeaderInfo] DOM 元素:', { nameEl, solarEl, lunarEl, termEl });
+
+    if (nameEl) nameEl.textContent = result?.name || '匿名';
+    if (solarEl) solarEl.textContent = result?.solar_date || '';
+    if (lunarEl) lunarEl.textContent = result?.lunar_date || '';
+    if (termEl) termEl.textContent = result?.solar_term || '';
+
+    console.log('[displayHeaderInfo] 显示内容:', {
+        name: result?.name || '匿名',
+        solar: result?.solar_date || '',
+        lunar: result?.lunar_date || '',
+        term: result?.solar_term || ''
+    });
+    console.log('[displayHeaderInfo] 显示完成');
 }
 
 async function displayPaiPanTable(result) {
     displayTenGods(result);
     displayHeavenlyStemAndEarthlyBranch(result);
     displayNayinRow(result);
+    displayZangganRow(result);
+    displayChangshengRow(result);
     await displayShenShaRow(result);
+}
+
+function displayZangganRow(result) {
+    // 藏干数据映射（只包含天干，十神根据年干动态计算）
+    const ZANGAN_MAP = {
+        '子': ['癸'],
+        '丑': ['己', '辛', '癸'],
+        '寅': ['甲', '丙', '戊'],
+        '卯': ['乙'],
+        '辰': ['戊', '乙', '癸'],
+        '巳': ['丙', '庚', '戊'],
+        '午': ['丁', '己'],
+        '未': ['己', '丁', '乙'],
+        '申': ['庚', '壬', '戊'],
+        '酉': ['辛'],
+        '戌': ['戊', '辛', '丁'],
+        '亥': ['壬', '甲']
+    };
+
+    // 获取年干
+    const yearGan = result.year ? result.year.charAt(0) : null;
+
+    // 四柱藏干
+    const pillars = ['year', 'month', 'day', 'hour'];
+    pillars.forEach(pillar => {
+        const zangganCell = document.getElementById(`zanggan-${pillar}`);
+        if (zangganCell && result[pillar]) {
+            const zhi = result[pillar].charAt(1); // 获取地支
+            const zangan = ZANGAN_MAP[zhi] || [];
+            zangganCell.innerHTML = zangan.map(gan => {
+                const ten = yearGan ? getTenGod(yearGan, gan) : '';
+                return `<div>${gan}<small style="color:#666;font-size:9px;">${ten}</small></div>`;
+            }).join('');
+        }
+    });
+
+    // 三垣藏干
+    const sanyuan = ['taiyuan', 'minggong', 'shengong'];
+    sanyuan.forEach(pillar => {
+        const zangganCell = document.getElementById(`zanggan-${pillar}`);
+        if (zangganCell && result[pillar]?.ganzhi) {
+            const zhi = result[pillar].ganzhi.charAt(1); // 获取地支
+            const zangan = ZANGAN_MAP[zhi] || [];
+            zangganCell.innerHTML = zangan.map(gan => {
+                const ten = yearGan ? getTenGod(yearGan, gan) : '';
+                return `<div>${gan}<small style="color:#666;font-size:9px;">${ten}</small></div>`;
+            }).join('');
+        }
+    });
+}
+
+function displayChangshengRow(result) {
+    const changshengData = result.nayin_changsheng || {};
+
+    // 四柱长生
+    const pillars = ['year', 'month', 'day', 'hour'];
+    pillars.forEach(pillar => {
+        const changshengCell = document.getElementById(`changsheng-${pillar}`);
+        if (changshengCell && changshengData[pillar]) {
+            const info = changshengData[pillar];
+            changshengCell.textContent = info.position || '';
+        }
+    });
+
+    // 三垣长生
+    const sanyuan = ['taiyuan', 'minggong', 'shengong'];
+    sanyuan.forEach(pillar => {
+        const changshengCell = document.getElementById(`changsheng-${pillar}`);
+        if (changshengCell && result[pillar]?.changsheng) {
+            const info = result[pillar].changsheng;
+            changshengCell.textContent = info.position || '';
+        }
+    });
 }
 
 function displayTenGods(result) {
     const tenGods = result.ten_gods || {};
-    document.getElementById('ten-god-year').textContent = tenGods.year_gan || '';
-    document.getElementById('ten-god-month').textContent = tenGods.month_gan || '';
-    document.getElementById('ten-god-day').textContent = tenGods.day_gan || '';
-    document.getElementById('ten-god-hour').textContent = tenGods.hour_gan || '';
+    // 获取年干
+    const yearGan = result.year ? result.year.charAt(0) : null;
+
+    // 四柱十神（使用算法提供的数据）
+    const yearEl = document.getElementById('shizhi-year');
+    if (yearEl) yearEl.textContent = tenGods.year_gan || '';
+    const monthEl = document.getElementById('shizhi-month');
+    if (monthEl) monthEl.textContent = tenGods.month_gan || '';
+    const dayEl = document.getElementById('shizhi-day');
+    if (dayEl) dayEl.textContent = tenGods.day_gan || '';
+    const hourEl = document.getElementById('shizhi-hour');
+    if (hourEl) hourEl.textContent = tenGods.hour_gan || '';
+
+    // 三垣十神：优先使用算法数据，否则根据年干动态计算
+    const taiyuanEl = document.getElementById('shizhi-taiyuan');
+    if (taiyuanEl) {
+        if (tenGods.taiyuan_gan) {
+            taiyuanEl.textContent = tenGods.taiyuan_gan;
+        } else if (yearGan && result.taiyuan?.ganzhi) {
+            const taiyuanGan = result.taiyuan.ganzhi.charAt(0);
+            taiyuanEl.textContent = getTenGod(yearGan, taiyuanGan);
+        }
+    }
+
+    const minggongEl = document.getElementById('shizhi-minggong');
+    if (minggongEl) {
+        if (tenGods.minggong_gan) {
+            minggongEl.textContent = tenGods.minggong_gan;
+        } else if (yearGan && result.minggong?.ganzhi) {
+            const minggongGan = result.minggong.ganzhi.charAt(0);
+            minggongEl.textContent = getTenGod(yearGan, minggongGan);
+        }
+    }
+
+    const shengongEl = document.getElementById('shizhi-shengong');
+    if (shengongEl) {
+        if (tenGods.shengong_gan) {
+            shengongEl.textContent = tenGods.shengong_gan;
+        } else if (yearGan && result.shengong?.ganzhi) {
+            const shengongGan = result.shengong.ganzhi.charAt(0);
+            shengongEl.textContent = getTenGod(yearGan, shengongGan);
+        }
+    }
 }
 
 function displayHeavenlyStemAndEarthlyBranch(result) {
+    // 处理四柱（字符串格式）
     const pillars = [
         { id: 'year', data: result.year },
         { id: 'month', data: result.month },
@@ -852,8 +1406,42 @@ function displayHeavenlyStemAndEarthlyBranch(result) {
 
     pillars.forEach(p => {
         if (p.data) {
-            document.getElementById(`stem-${p.id}`).textContent = p.data.charAt(0);
-            document.getElementById(`branch-${p.id}`).textContent = p.data.charAt(1);
+            const stem = p.data.charAt(0);
+            const branch = p.data.charAt(1);
+            const stemCell = document.getElementById(`stem-${p.id}`);
+            const branchCell = document.getElementById(`branch-${p.id}`);
+            if (stemCell) {
+                stemCell.textContent = stem;
+                stemCell.className = `table-cell stem-cell ${WUXING_COLORS[GAN_WUXING[stem]] || ''}`;
+            }
+            if (branchCell) {
+                branchCell.textContent = branch;
+                branchCell.className = `table-cell branch-cell ${WUXING_COLORS[ZHI_WUXING[branch]] || ''}`;
+            }
+        }
+    });
+
+    // 处理三垣（对象格式，包含 ganzhi 字段）
+    const sanyuan = [
+        { id: 'taiyuan', data: result.taiyuan?.ganzhi },
+        { id: 'minggong', data: result.minggong?.ganzhi },
+        { id: 'shengong', data: result.shengong?.ganzhi }
+    ];
+
+    sanyuan.forEach(s => {
+        if (s.data) {
+            const stem = s.data.charAt(0);
+            const branch = s.data.charAt(1);
+            const stemCell = document.getElementById(`stem-${s.id}`);
+            const branchCell = document.getElementById(`branch-${s.id}`);
+            if (stemCell) {
+                stemCell.textContent = stem;
+                stemCell.className = `table-cell stem-cell ${WUXING_COLORS[GAN_WUXING[stem]] || ''}`;
+            }
+            if (branchCell) {
+                branchCell.textContent = branch;
+                branchCell.className = `table-cell branch-cell ${WUXING_COLORS[ZHI_WUXING[branch]] || ''}`;
+            }
         }
     });
 }
@@ -863,6 +1451,10 @@ function displayNayinRow(result) {
     document.getElementById('nayin-month').textContent = result.month_nayin || '';
     document.getElementById('nayin-day').textContent = result.day_nayin || '';
     document.getElementById('nayin-hour').textContent = result.hour_nayin || '';
+    // 三垣纳音
+    document.getElementById('nayin-taiyuan').textContent = result.taiyuan?.nayin || '';
+    document.getElementById('nayin-minggong').textContent = result.minggong?.nayin || '';
+    document.getElementById('nayin-shengong').textContent = result.shengong?.nayin || '';
 }
 
 async function displayShenShaRow(result) {
@@ -874,27 +1466,65 @@ async function displayShenShaRow(result) {
             hour_ganzhi: result.hour
         });
 
+        // 四柱神煞
         ['year', 'month', 'day', 'hour'].forEach(pillar => {
-            const cell = document.getElementById(`shen-sha-${pillar}`);
+            const cell = document.getElementById(`shensha-${pillar}`);
             const list = shenshaResult.shensha_by_column?.[pillar] || [];
             cell.textContent = list.length > 0 ? list.join(', ') : '无神煞';
+        });
+
+        // 三垣神煞（使用相同的神煞数据，或者可以留空）
+        ['taiyuan', 'minggong', 'shengong'].forEach(pillar => {
+            const cell = document.getElementById(`shensha-${pillar}`);
+            if (cell) {
+                cell.textContent = '无神煞';
+            }
         });
     } catch (e) {
         console.error('神煞计算失败:', e);
     }
 }
 
+function displaySanyuanItem(type, data) {
+    console.log(`displaySanyuanItem('${type}', ${JSON.stringify(data)})`);
+    const ganzhiElement = document.getElementById(`${type}-ganzhi`);
+    const nayinElement = document.getElementById(`${type}-nayin`);
+    const changshengElement = document.getElementById(`${type}-changsheng`);
+
+    console.log(`Elements for ${type}:`, { ganzhiElement, nayinElement, changshengElement });
+
+    if (ganzhiElement && data.ganzhi) {
+        ganzhiElement.textContent = data.ganzhi;
+        console.log(`Set ${type}-ganzhi to:`, data.ganzhi);
+    }
+    if (nayinElement && data.nayin) {
+        nayinElement.textContent = data.nayin;
+        console.log(`Set ${type}-nayin to:`, data.nayin);
+    }
+    if (changshengElement && data.changsheng) {
+        const position = data.changsheng.position || '未知';
+        const jiXiong = data.changsheng.ji_xiong || '未知';
+        changshengElement.textContent = `${position} (${jiXiong})`;
+        console.log(`Set ${type}-changsheng to:`, `${position} (${jiXiong})`);
+    }
+}
+
 function displaySanyuan(result) {
-    ['taiyuan', 'minggong', 'shengong'].forEach(type => {
-        const data = result[type] || {};
-        const prefix = type === 'taiyuan' ? '胎元' : type === 'minggong' ? '命宫' : '身宫';
-        document.getElementById(`${type}-ganzhi`).textContent = data.ganzhi || '';
-        document.getElementById(`${type}-nayin`).textContent = data.nayin || '';
-    });
+    console.log('displaySanyuan called with result:', result);
+    const taiyuan = result.taiyuan || {};
+    const minggong = result.minggong || {};
+    const shengong = result.shengong || {};
+
+    console.log('Sanyuan data:', { taiyuan, minggong, shengong });
+
+    displaySanyuanItem('taiyuan', taiyuan);
+    displaySanyuanItem('minggong', minggong);
+    displaySanyuanItem('shengong', shengong);
 }
 
 function displayChangshengDetails(result) {
     const selfChangsheng = document.getElementById('self-changsheng');
+    if (!selfChangsheng) return;
     const cs = result.nayin_changsheng || {};
     let html = '';
     ['year', 'month', 'day', 'hour'].forEach(p => {
@@ -907,13 +1537,26 @@ function displayChangshengDetails(result) {
 
 async function displayDayunLiunian(result) {
     const gender = document.querySelector('#gender-group .btn-gender.active').dataset.value;
-    const birthYear = result.solar_date?.split('-')[0];
 
-    if (!birthYear) return;
+    // 从 solar_date 解析年份，如果是干支输入则使用当前年份
+    let birthYear;
+    if (result.solar_date && result.solar_date !== '干支输入' && result.solar_date !== '未知') {
+        birthYear = parseInt(result.solar_date.split('-')[0]);
+    } else if (result.original_solar?.year) {
+        birthYear = result.original_solar.year;
+    } else {
+        // 干支输入模式，无法计算真实大运，使用当前年份作为参考
+        birthYear = new Date().getFullYear();
+    }
 
-    const dayunResult = await calculateDayun(result, gender, { year: parseInt(birthYear), month: 1, day: 1, hour: 12, minute: 0 });
+    if (!birthYear || isNaN(birthYear)) {
+        console.warn('无法获取有效的出生年份，跳过大运计算');
+        return;
+    }
+
+    const dayunResult = await calculateDayun(result, gender, { year: birthYear, month: 1, day: 1, hour: 12, minute: 0 });
     currentDayunResult = dayunResult;
-    currentBirthYear = parseInt(birthYear);
+    currentBirthYear = birthYear;
 
     const liunianResult = await getCurrentLiunian();
     displayDayunResult(dayunResult, currentAge);
@@ -955,6 +1598,33 @@ function displayDayunResult(dayunResult, currentAge) {
         rows[3].innerHTML += `<td>${dayun.start_age}岁</td>`;
         rows[4].innerHTML += `<td>${dayun.start_date || ''}</td>`;
     });
+
+    // 渲染小运表格
+    displayXiaoyunResult(dayunResult);
+}
+
+function displayXiaoyunResult(dayunResult) {
+    const xiaoyunTable = document.getElementById('xiaoyun-table');
+    if (!xiaoyunTable) return;
+
+    const rows = xiaoyunTable.querySelectorAll('tbody tr');
+
+    // 清空现有数据
+    rows.forEach(row => {
+        while (row.children.length > 1) row.removeChild(row.lastChild);
+    });
+
+    // 获取小运数据，默认显示前12个小运
+    const xiaoyunList = dayunResult.xiaoyun || [];
+    const displayCount = Math.min(12, xiaoyunList.length);
+
+    for (let i = 0; i < displayCount; i++) {
+        const xiaoyun = xiaoyunList[i];
+        if (rows[0]) rows[0].innerHTML += `<td>${xiaoyun.ten_god || ''}</td>`;
+        if (rows[1]) rows[1].innerHTML += `<td>${xiaoyun.ganzhi || ''}</td>`;
+        if (rows[2]) rows[2].innerHTML += `<td>${xiaoyun.nayin || ''}</td>`;
+        if (rows[3]) rows[3].innerHTML += `<td>${xiaoyun.age}岁</td>`;
+    }
 }
 
 function displayLiunianResult(liunianResult) {
@@ -974,6 +1644,50 @@ function displayLiunianResult(liunianResult) {
 async function saveRecord(inputData, resultData) {
     try {
         if (!db.db) await db.init();
+
+        // 标准化性别值
+        const genderValue = inputData.gender === 'male' ? '男' : '女';
+
+        // 合并原始输入数据到 fullData，确保专业页面能正确加载
+        const fullData = {
+            ...resultData,
+            name: inputData.name || '匿名',
+            gender: genderValue,  // 直接存储标准化的性别值
+            dateType: inputData.date_type,  // 确保 dateType 在 fullData 中
+            is_leap_month: inputData.is_leap_month || false,
+            longitude: inputData.longitude || 120,
+            use_true_solar: inputData.use_true_solar !== false
+        };
+
+        // 根据输入类型保存不同的原始数据
+        if (inputData.date_type === 'ganzhi' && inputData.ganzhi) {
+            // 干支输入模式 - 保存原始干支数据
+            fullData.original_ganzhi = inputData.ganzhi;
+        } else if (inputData.date_type === 'lunar') {
+            // 农历输入模式 - 保存原始农历数据
+            fullData.original_lunar = {
+                year: inputData.lunar_year,
+                month: inputData.lunar_month,
+                day: inputData.lunar_day,
+                is_leap_month: inputData.is_leap_month || false,
+                hour: inputData.hour !== undefined ? inputData.hour : 12,
+                minute: inputData.minute || 0
+            };
+            // 同时保存公历数据（从 resultData 中获取）
+            if (resultData.original_solar) {
+                fullData.original_solar = resultData.original_solar;
+            }
+        } else {
+            // 公历输入模式 - 保存原始公历数据
+            fullData.original_solar = {
+                year: inputData.solar_year,
+                month: inputData.solar_month,
+                day: inputData.solar_day,
+                hour: inputData.hour !== undefined ? inputData.hour : 12,
+                minute: inputData.minute || 0
+            };
+        }
+
         const record = {
             name: inputData.name || '匿名',
             gender: inputData.gender === 'male' ? '男' : '女',
@@ -984,7 +1698,8 @@ async function saveRecord(inputData, resultData) {
             month: resultData.month || '',
             day: resultData.day || '',
             hour: resultData.hour || '',
-            fullData: resultData
+            zodiac: resultData.zodiac || '',
+            fullData: fullData
         };
         await db.addRecord(record);
     } catch (e) {

@@ -8,13 +8,26 @@
 :root {
     --primary-color: #D4AF37;
     --primary-dark: #B8962E;
+    --primary-light: rgba(212, 175, 55, 0.15);
     --bg-dark: #F5F0E6;
     --bg-card: #FFFEF9;
+    --bg-card-hover: #F5F0E6;
     --bg-input: #FFFFFF;
     --text-primary: #333333;
     --text-secondary: #666666;
     --text-muted: #999999;
-    --border-color: rgba(212,175,55,0.3);
+    --border-color: rgba(212, 175, 55, 0.3);
+    --border-light: rgba(212, 175, 55, 0.3);
+    --success: #4CAF50;
+    --warning: #FF9800;
+    --danger: #F44336;
+
+    /* 五行颜色 */
+    --wuxing-mu: #4CAF50;
+    --wuxing-huo: #F44336;
+    --wuxing-tu: #8D6E63;
+    --wuxing-jin: #FFC107;
+    --wuxing-shui: #2196F3;
 }
 
 body {
@@ -99,6 +112,126 @@ body {
     color: var(--text-primary);
     font-size: 14px;
     outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.select-field:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+}
+
+.select-field option {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    padding: 8px;
+}
+
+/* ===== 自定义年份选择器 ===== */
+.custom-select-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.custom-select-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-select-trigger.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+}
+
+.custom-select-arrow {
+    font-size: 10px;
+    color: var(--text-secondary);
+    transition: transform 0.2s;
+}
+
+.custom-select-trigger.active .custom-select-arrow {
+    transform: rotate(180deg);
+}
+
+.custom-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-top: 4px;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-select-dropdown.active {
+    display: block;
+}
+
+.custom-select-options {
+    max-height: 200px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) var(--bg-input);
+}
+
+.custom-select-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-select-options::-webkit-scrollbar-track {
+    background: var(--bg-input);
+    border-radius: 3px;
+}
+
+.custom-select-options::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+.custom-select-option {
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.custom-select-option:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.custom-select-option.selected {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* 年份选择器下拉列表高度限制 */
+#year-select {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* WebKit浏览器下拉列表样式 */
+#year-select::-webkit-scrollbar {
+    width: 8px;
+}
+
+#year-select::-webkit-scrollbar-track {
+    background: var(--bg-input);
+    border-radius: 4px;
+}
+
+#year-select::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
 }
 
 .date-selects {
@@ -234,9 +367,12 @@ input:checked + .slider:before {
 }
 
 .section-title {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .bazi-display {
@@ -777,7 +913,7 @@ input:checked + .slider:before {
 .wuxing-mu { color: #4CAF50; }
 .wuxing-huo { color: #F44336; }
 .wuxing-tu { color: #8D6E63; }
-.wuxing-jin { color: #9E9E9E; }
+.wuxing-jin { color: #FFC107; }
 .wuxing-shui { color: #2196F3; }
 
 /* 旧样式保留 */
@@ -1531,4 +1667,139 @@ input:checked + .slider:before {
     background: var(--primary-color);
     border-color: var(--primary-color);
     color: #000;
+}
+
+/* ===== 窄屏优化 ===== */
+@media screen and (max-width: 400px) {
+    /* 干支弹窗优化 */
+    .ganzhi-modal {
+        max-height: 90vh;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .modal-tabs {
+        padding: 0 8px;
+    }
+
+    .modal-tab {
+        padding: 12px 4px;
+        font-size: 13px;
+    }
+
+    /* 干支网格改为2列 */
+    .ganzhi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        padding: 0 8px;
+    }
+
+    .ganzhi-col-label {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .ganzhi-col-buttons {
+        gap: 8px;
+    }
+
+    .ganzhi-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+    }
+
+    /* 日期选择器优化 */
+    .modal-date-inputs,
+    .modal-time-inputs {
+        gap: 6px;
+    }
+
+    .modal-date-inputs .select-field,
+    .modal-time-inputs .select-field {
+        padding: 10px 8px;
+        font-size: 14px;
+    }
+
+    /* 弹窗底部优化 */
+    .modal-footer {
+        padding: 12px;
+    }
+
+    .modal-footer-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    /* 按钮 */
+    .modal-footer .btn {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+
+    /* 浮层优化 - 窄屏居中显示 */
+    .picker-tooltip {
+        left: 50% !important;
+        transform: translateX(-50%);
+        max-width: calc(100vw - 20px);
+        padding: 10px;
+    }
+
+    .picker-item {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    #gan-picker-tooltip .picker-tooltip-content {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+        width: fit-content;
+        margin: 0 auto;
+    }
+
+    #zhi-picker-tooltip .picker-tooltip-content {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        width: fit-content;
+        margin: 0 auto;
+    }
+}
+
+/* 超窄屏（小于 320px）*/
+@media screen and (max-width: 320px) {
+    .ganzhi-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .ganzhi-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+
+    .modal-tab {
+        font-size: 12px;
+        padding: 10px 2px;
+    }
+
+    /* 浮层优化 - 超窄屏 */
+    .picker-tooltip {
+        padding: 8px;
+    }
+
+    .picker-item {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    #gan-picker-tooltip .picker-tooltip-content {
+        gap: 4px;
+    }
+
+    #zhi-picker-tooltip .picker-tooltip-content {
+        gap: 4px;
+    }
 }

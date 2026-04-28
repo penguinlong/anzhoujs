@@ -53,7 +53,12 @@
       "Bash(unset:*)",
       "WebSearch",
       "Bash(mkdir -p .claude/plans)",
-      "Bash(cp -r .opencode/plans/* .claude/plans/)"
+      "Bash(cp -r .opencode/plans/* .claude/plans/)",
+      "Bash(cp -r \"c:/Users/Administrator/Desktop/anzhoujs/前端/首页排盘/\"* \"c:/Users/Administrator/Desktop/anzhoujs/Android/app/src/main/assets/web/首页排盘/\")",
+      "Bash(cp -r \"c:/Users/Administrator/Desktop/anzhoujs/前端/records/\"* \"c:/Users/Administrator/Desktop/anzhoujs/Android/app/src/main/assets/web/records/\")",
+      "Bash(cp -r \"c:/Users/Administrator/Desktop/anzhoujs/前端/professional/\"* \"c:/Users/Administrator/Desktop/anzhoujs/Android/app/src/main/assets/web/professional/\")",
+      "Bash(cp -r \"c:/Users/Administrator/Desktop/anzhoujs/前端/用户管理/\"* \"c:/Users/Administrator/Desktop/anzhoujs/Android/app/src/main/assets/web/用户管理/\")",
+      "Bash(cp -r \"c:/Users/Administrator/Desktop/anzhoujs/前端/学堂/\"* \"c:/Users/Administrator/Desktop/anzhoujs/Android/app/src/main/assets/web/学堂/\")"
     ]
   }
 }

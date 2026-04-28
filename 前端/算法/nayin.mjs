@@ -46,14 +46,21 @@ NayinCalculator.prototype.getChangshengByGan = function(gan, zhi) {
 };
 
 NayinCalculator.prototype.getChangshengByNayin = function(nayin, zhi) {
+  console.log('getChangshengByNayin called with:', { nayin, zhi });
   const wuxing = NAYIN_WUXING[nayin] || '';
+  console.log('wuxing =', wuxing);
   const changshengStart = NAYIN_CHANGSHENG[wuxing] || '';
-  if (!changshengStart || !zhi) return { nayin, wuxing, position: '未知', ji_xiong: '未知', zhi };
+  console.log('changshengStart =', changshengStart);
+  if (!changshengStart || !zhi) {
+    console.log('getChangshengByNayin: returning default due to missing data');
+    return { nayin, wuxing, position: '未知', ji_xiong: '未知', zhi };
+  }
   const startIndex = ZHI_INDEX[changshengStart] || 0;
   const zhiIndex = ZHI_INDEX[zhi] || 0;
   const positionIndex = (zhiIndex - startIndex + 12) % 12;
   const position = CHANGSHENG_12[positionIndex];
   const ji_xiong = JI_XIONG[position] || '未知';
+  console.log('getChangshengByNayin result:', { nayin, wuxing, position, ji_xiong, zhi });
   return { nayin, wuxing, position, ji_xiong, zhi };
 };
 

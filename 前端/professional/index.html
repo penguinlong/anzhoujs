@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>禄命排盘 - 专业细盘</title>
+    <!-- 确保URL以斜杠结尾，解决相对路径问题 -->
+    <script>
+        console.log('[URL Redirect Debug] 专业页面加载，路径:', location.pathname);
+        console.log('[URL Redirect Debug] 查询参数:', location.search);
+        console.log('[URL Redirect Debug] 完整URL:', location.href);
+        // 不再执行任何重定向，避免丢失查询参数
+        console.log('[URL Redirect Debug] 跳过所有重定向逻辑');
+    </script>
     <link rel="stylesheet" href="style.css">
     <script src="../算法/lunar.js"></script>
 </head>
@@ -192,12 +200,10 @@
                     <div class="dayun-subtitle">大运（<span id="dayun-direction">顺行</span>）</div>
                     <div class="dayun-table-scroll">
                         <table class="dayun-table" id="dayun-table">
-                            <thead>
-                                <tr class="dayun-header-row">
-                                    <th class="dayun-label-cell">十神</th>
-                                </tr>
-                            </thead>
                             <tbody>
+                                <tr class="dayun-tengod-row">
+                                    <td class="dayun-label-cell">十神</td>
+                                </tr>
                                 <tr class="dayun-ganzhi-row">
                                     <td class="dayun-label-cell">大运</td>
                                 </tr>
@@ -371,6 +377,6 @@
 
     <script src="../common/database.js"></script>
     <script src="../common/cloud-api.js"></script>
-    <script src="script.js" type="module"></script>
+    <script src="script.js?v=20260428c" type="module"></script>
 </body>
 </html>

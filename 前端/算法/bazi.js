@@ -60,10 +60,22 @@ class BaziCalculator {
   }
 
   calculateFromGanzhi(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi) {
+    console.log('BaziCalculator.calculateFromGanzhi called with:', { yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi });
+
     // 获取生肖（根据年支）
     const yearZhi = yearGanzhi[1];
+    const yearNayin = this.nayinCalc.getNayin(yearGanzhi);
 
-    return {
+    console.log('yearZhi =', yearZhi, 'yearNayin =', yearNayin);
+
+    // 计算三垣
+    const taiyuan = this._calculateTaiyuan(monthGanzhi[0], monthGanzhi[1], yearNayin);
+    const minggong = this._calculateMinggong(yearGanzhi[0], monthGanzhi[1], hourGanzhi[1], yearNayin, null);
+    const shengong = this._calculateShengong(yearGanzhi[0], dayGanzhi[0], monthGanzhi[1], hourGanzhi[1], yearNayin, null);
+
+    console.log('三垣计算结果:', { taiyuan, minggong, shengong });
+
+    const result = {
       'year': yearGanzhi,
       'month': monthGanzhi,
       'day': dayGanzhi,
@@ -84,13 +96,13 @@ class BaziCalculator {
       'zodiac': ZHI_ZODIAC[yearZhi] || '未知',
       'ten_gods': {
         'year_gan': '年主',
-        'month_gan': this.lunarCalc._getTenGod(dayGanzhi[0], monthGanzhi[0]),
-        'day_gan': '日主',
-        'hour_gan': this.lunarCalc._getTenGod(dayGanzhi[0], hourGanzhi[0]),
-        'year_zhi': '年支',
-        'month_zhi': this.lunarCalc._getTenGod(dayGanzhi[0], monthGanzhi[1]),
-        'day_zhi': '日支',
-        'hour_zhi': this.lunarCalc._getTenGod(dayGanzhi[0], hourGanzhi[1])
+        'month_gan': this.lunarCalc._getTenGod(yearGanzhi[0], monthGanzhi[0]),
+        'day_gan': this.lunarCalc._getTenGod(yearGanzhi[0], dayGanzhi[0]),
+        'hour_gan': this.lunarCalc._getTenGod(yearGanzhi[0], hourGanzhi[0]),
+        'year_zhi': '年主',
+        'month_zhi': this.lunarCalc._getTenGod(yearGanzhi[0], monthGanzhi[1]),
+        'day_zhi': this.lunarCalc._getTenGod(yearGanzhi[0], dayGanzhi[1]),
+        'hour_zhi': this.lunarCalc._getTenGod(yearGanzhi[0], hourGanzhi[1])
       },
       'nayin_changsheng': {
         'year': this.nayinCalc.getChangshengInfo(dayGanzhi, yearGanzhi[1]),
@@ -102,8 +114,15 @@ class BaziCalculator {
         'month_zhi': this.nayinCalc.getChangshengByNayin(yearGanzhi[0], monthGanzhi[1]),
         'day_zhi': this.nayinCalc.getChangshengByNayin(yearGanzhi[0], dayGanzhi[1]),
         'hour_zhi': this.nayinCalc.getChangshengByNayin(yearGanzhi[0], hourGanzhi[1])
-      }
+      },
+      // 三垣数据
+      'taiyuan': taiyuan,
+      'minggong': minggong,
+      'shengong': shengong
     };
+
+    console.log('calculateFromGanzhi returning:', result);
+    return result;
   }
 
   _calculate(solar, longitude, useTrueSolar, originalYear, originalMonth, originalDay, originalHour, originalMinute, isLeapMonth = false) {
